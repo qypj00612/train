@@ -1,4 +1,4 @@
-package com.ypj.common.aspect;
+package com.ypj.train.common.aspect;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;

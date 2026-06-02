@@ -3,6 +3,9 @@ package com.ypj.train.member.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ypj.train.common.exception.BusinessException;
+import com.ypj.train.common.exception.enums.BusinessExceptionEnum;
+import com.ypj.train.common.util.SnowUtil;
 import com.ypj.train.member.domain.Member;
 import com.ypj.train.member.mapper.MemberMapper;
 import com.ypj.train.member.req.MemberRegisterReq;
@@ -30,12 +33,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member>
         LambdaQueryWrapper<Member> queryWrapper = new LambdaQueryWrapper<Member>()
                 .eq(Member::getMobile, mobile);
         List<Member> members = memberMapper.selectList(queryWrapper);
+
         if(CollUtil.isNotEmpty(members)){
-            throw new RuntimeException("手机号被注册");
+            throw new BusinessException(BusinessExceptionEnum.MOBILE_EXIST);
         }
 
         Member member = new Member();
-        member.setId(System.currentTimeMillis());
+        member.setId(SnowUtil.getSnowTime());
         member.setMobile(mobile);
 
         memberMapper.insert(member);

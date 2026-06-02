@@ -1,4 +1,4 @@
-package com.ypj.common.resp;
+package com.ypj.train.common.resp;
 
 public class CommonResp <T>{
     /**

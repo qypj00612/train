@@ -1,8 +1,9 @@
 package com.ypj.train.member.controller;
 
-import com.ypj.common.resp.CommonResp;
+import com.ypj.train.common.resp.CommonResp;
 import com.ypj.train.member.req.MemberRegisterReq;
 import com.ypj.train.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class MemberController {
     }
 
     @PostMapping("register")
-    public CommonResp<Long> register(MemberRegisterReq mobile){
+    public CommonResp<Long> register(@Valid MemberRegisterReq mobile){
         long register = memberService.register(mobile);
         return new CommonResp<>(register);
     }
