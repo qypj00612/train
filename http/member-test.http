@@ -1,0 +1,12 @@
+GET localhost:8000/member/count
+Content-Type: application/x-www-form-urlencoded
+
+###
+
+
+POST http://localhost:8001/member/register
+Content-Type: application/x-www-form-urlencoded
+
+mobile=6664
+
+###

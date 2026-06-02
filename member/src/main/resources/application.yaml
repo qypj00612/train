@@ -1,2 +1,6 @@
 server:
   port: 8001
+ypj:
+  db:
+    database: train_member
+    un: train_member
