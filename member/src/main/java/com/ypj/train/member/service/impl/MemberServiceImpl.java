@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ypj.train.common.exception.BusinessException;
 import com.ypj.train.common.exception.enums.BusinessExceptionEnum;
+import com.ypj.train.common.util.JwtUtil;
 import com.ypj.train.common.util.SnowUtil;
 import com.ypj.train.member.domain.Member;
 import com.ypj.train.member.mapper.MemberMapper;
@@ -94,6 +95,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member>
         if(!"8888".equals(code)){
             throw new BusinessException(BusinessExceptionEnum.CODE_ERROR);
         }
-        return BeanUtil.copyProperties(members, MemberLoginResp.class);
+        MemberLoginResp resp = BeanUtil.copyProperties(members, MemberLoginResp.class);
+        String token = JwtUtil.createToken(resp.getId(), resp.getToken());
+        resp.setToken(token);
+        return resp;
     }
 }

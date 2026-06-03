@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class MemberLoginResp {
-    String mobile;
-    Long id;
+    private String mobile;
+    private Long id;
+    private String token;
 }

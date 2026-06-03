@@ -8,10 +8,7 @@ import com.ypj.train.member.resp.MemberLoginResp;
 import com.ypj.train.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member")
@@ -27,19 +24,19 @@ public class MemberController {
     }
 
     @PostMapping("register")
-    public CommonResp<Long> register(@Valid MemberRegisterReq mobile){
+    public CommonResp<Long> register(@Valid @RequestBody MemberRegisterReq mobile){
         long register = memberService.register(mobile);
         return new CommonResp<>(register);
     }
 
     @PostMapping("send-code")
-    public CommonResp<String> sendCode(@Valid MemberSendCodeReq mobile){
+    public CommonResp<String> sendCode(@Valid @RequestBody MemberSendCodeReq mobile){
         memberService.sendCode(mobile);
         return new CommonResp<>();
     }
 
     @PostMapping("login")
-    public CommonResp<MemberLoginResp> login(@Valid MemberLoginReq loginReq){
+    public CommonResp<MemberLoginResp> login(@Valid @RequestBody MemberLoginReq loginReq){
         MemberLoginResp resp = memberService.login(loginReq);
         return new CommonResp<>(resp);
     }
