@@ -1,7 +1,10 @@
 package com.ypj.train.member.controller;
 
 import com.ypj.train.common.resp.CommonResp;
+import com.ypj.train.member.req.MemberLoginReq;
 import com.ypj.train.member.req.MemberRegisterReq;
+import com.ypj.train.member.req.MemberSendCodeReq;
+import com.ypj.train.member.resp.MemberLoginResp;
 import com.ypj.train.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +30,17 @@ public class MemberController {
     public CommonResp<Long> register(@Valid MemberRegisterReq mobile){
         long register = memberService.register(mobile);
         return new CommonResp<>(register);
+    }
+
+    @PostMapping("send-code")
+    public CommonResp<String> sendCode(@Valid MemberSendCodeReq mobile){
+        memberService.sendCode(mobile);
+        return new CommonResp<>();
+    }
+
+    @PostMapping("login")
+    public CommonResp<MemberLoginResp> login(@Valid MemberLoginReq loginReq){
+        MemberLoginResp resp = memberService.login(loginReq);
+        return new CommonResp<>(resp);
     }
 }

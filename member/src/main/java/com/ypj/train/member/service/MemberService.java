@@ -2,7 +2,10 @@ package com.ypj.train.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ypj.train.member.domain.Member;
+import com.ypj.train.member.req.MemberLoginReq;
 import com.ypj.train.member.req.MemberRegisterReq;
+import com.ypj.train.member.req.MemberSendCodeReq;
+import com.ypj.train.member.resp.MemberLoginResp;
 
 /**
 * @author Ypj
@@ -12,4 +15,8 @@ import com.ypj.train.member.req.MemberRegisterReq;
 public interface MemberService extends IService<Member> {
 
     long register(MemberRegisterReq req);
+
+    void sendCode(MemberSendCodeReq mobile);
+
+    MemberLoginResp login(MemberLoginReq loginReq);
 }
