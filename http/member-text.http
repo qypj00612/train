@@ -18,3 +18,9 @@ Content-Type: application/json
   "mobile": "13000000001",
   "code": "8888"
 }
+
+###
+POST http://localhost:8000/member/count
+Content-Type: application/json
+token: 123
+
