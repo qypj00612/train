@@ -1,8 +1,11 @@
 package com.ypj.train.member.service;
 
-import com.ypj.train.member.domain.Passenger;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ypj.train.common.resp.PageResp;
+import com.ypj.train.member.domain.Passenger;
+import com.ypj.train.member.req.PassengerQueryReq;
 import com.ypj.train.member.req.PassengerSaveReq;
+import com.ypj.train.member.resp.PassengerQueryResp;
 
 /**
 * @author Ypj
@@ -12,4 +15,6 @@ import com.ypj.train.member.req.PassengerSaveReq;
 public interface PassengerService extends IService<Passenger> {
 
     void save(PassengerSaveReq passengerSaveReq);
+
+    PageResp<PassengerQueryResp> queryList(PassengerQueryReq passengerQueryReq);
 }

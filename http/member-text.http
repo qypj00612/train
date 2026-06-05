@@ -19,19 +19,15 @@ Content-Type: application/json
   "code": "8888"
 }
 
+> {%
+    client.log(JSON.stringify(response.body));
+    client.log(JSON.stringify(response.body.content.token));
+    client.global.set("token", response.body.content.token);
+%}
+
 ###
 POST http://localhost:8000/member/count
 Content-Type: application/json
 token: 123
 
-###
-POST http://localhost:8001/passenger/save
-Content-Type: application/json
-
-{
-  "memberId": "111",
-  "name": "SGFSWE4G",
-  "idCard": "33333",
-  "type": "1"
-}
 
