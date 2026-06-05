@@ -1,0 +1,15 @@
+POST http://localhost:8000/passenger/save
+Content-Type: application/json
+token: {{token}}
+
+{
+  "name": "87fngftnf",
+  "idCard": "33333",
+  "type": "1"
+}
+
+###
+
+GET http://localhost:8000/passenger/query-list?page=1&size=3
+Content-Type: application/json
+token: {{token}}

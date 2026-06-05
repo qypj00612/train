@@ -96,7 +96,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member>
             throw new BusinessException(BusinessExceptionEnum.CODE_ERROR);
         }
         MemberLoginResp resp = BeanUtil.copyProperties(members, MemberLoginResp.class);
-        String token = JwtUtil.createToken(resp.getId(), resp.getToken());
+        String token = JwtUtil.createToken(resp.getId(), resp.getMobile());
         resp.setToken(token);
         return resp;
     }

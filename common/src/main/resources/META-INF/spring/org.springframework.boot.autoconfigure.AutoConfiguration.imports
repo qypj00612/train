@@ -1,2 +1,3 @@
 com.ypj.train.common.aspect.LogAspect
 com.ypj.train.common.exception.handle.ControllerExceptionHandle
+com.ypj.train.common.config.MyBatisConfig
