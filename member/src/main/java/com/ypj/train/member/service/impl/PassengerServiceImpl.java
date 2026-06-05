@@ -2,6 +2,7 @@ package com.ypj.train.member.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -60,11 +61,16 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
     public void save(PassengerSaveReq passengerSaveReq) {
         DateTime now = DateTime.now();
         Passenger passenger = BeanUtil.copyProperties(passengerSaveReq, Passenger.class);
-        passenger.setMemberId(MemberContext.getId());
-        passenger.setCreateTime(now);
-        passenger.setUpdateTime(now);
-        passenger.setId(SnowUtil.getSnowTime());
-        passengerMapper.insert(passenger);
+        if(ObjectUtil.isNull(passenger.getId())) {
+            passenger.setMemberId(MemberContext.getId());
+            passenger.setCreateTime(now);
+            passenger.setUpdateTime(now);
+            passenger.setId(SnowUtil.getSnowTime());
+            passengerMapper.insert(passenger);
+        }else{
+            passenger.setUpdateTime(now);
+            passengerMapper.updateById(passenger);
+        }
     }
 }
 

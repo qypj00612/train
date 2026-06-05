@@ -115,7 +115,7 @@ export default defineComponent({
           notification.success({description: "删除成功！"});
           handleQuery({
             page: pagination.value.current,
-            size: pagination.value.pageSize,
+            pageSize: pagination.value.pageSize,
           });
         } else {
           notification.error({description: data.message});
