@@ -34,7 +34,7 @@
         <a-input v-model:value="station.namePinyin" disabled/>
       </a-form-item>
       <a-form-item label="拼音首字母">
-        <a-input v-model:value="station.nameInitials" disabled/>
+        <a-input v-model:value="station.namePy" disabled/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -54,7 +54,7 @@ export default defineComponent({
       id: undefined,
       name: undefined,
       namePinyin: undefined,
-      nameInitials: undefined,
+      namePy: undefined,
       createTime: undefined,
       updateTime: undefined,
     });
@@ -92,10 +92,10 @@ export default defineComponent({
     watch(() => station.value.name, () => {
       if (Tool.isNotEmpty(station.value.name)) {
         station.value.namePinyin = pinyin(station.value.name, {toneType: 'none'}).replace(" ", "");
-        station.value.nameInitials = pinyin(station.value.name, {pattern: 'first', toneType: 'none'}).replace(" ", "");
+        station.value.namePy = pinyin(station.value.name, {pattern: 'first', toneType: 'none'}).replace(" ", "");
       } else {
         station.value.namePinyin = "";
-        station.value.nameInitials = "";
+        station.value.namePy = "";
       }
     }, {immediate: true});
 
@@ -110,13 +110,13 @@ export default defineComponent({
     };
 
     const onDelete = (record) => {
-      axios.delete("/business/admin/station/delete/" + record.id).then((response) => {
+      axios.delete("/admin/station/delete/" + record.id).then((response) => {
         const data = response.data;
         if (data.success) {
           notification.success({description: "删除成功！"});
           handleQuery({
             page: pagination.value.current,
-            size: pagination.value.pageSize,
+            pageSize: pagination.value.pageSize,
           });
         } else {
           notification.error({description: data.message});
@@ -125,7 +125,7 @@ export default defineComponent({
     };
 
     const handleOk = () => {
-      axios.post("/business/admin/station/save", station.value).then((response) => {
+      axios.post("/admin/station/save", station.value).then((response) => {
         let data = response.data;
         if (data.success) {
           notification.success({description: "保存成功！"});
@@ -148,7 +148,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/station/query-list", {
+      axios.get("/admin/station/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize
