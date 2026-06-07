@@ -143,13 +143,13 @@ export default defineComponent({
     };
 
     const onDelete = (record) => {
-      axios.delete("/business/admin/train-carriage/delete/" + record.id).then((response) => {
+      axios.delete("/admin/train-carriage/delete/" + record.id).then((response) => {
         const data = response.data;
         if (data.success) {
           notification.success({description: "删除成功！"});
           handleQuery({
             page: pagination.value.current,
-            size: pagination.value.pageSize,
+            pageSize: pagination.value.pageSize,
           });
         } else {
           notification.error({description: data.message});
@@ -158,7 +158,7 @@ export default defineComponent({
     };
 
     const handleOk = () => {
-      axios.post("/business/admin/train-carriage/save", trainCarriage.value).then((response) => {
+      axios.post("/admin/train-carriage/save", trainCarriage.value).then((response) => {
         let data = response.data;
         if (data.success) {
           notification.success({description: "保存成功！"});
@@ -181,7 +181,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/train-carriage/query-list", {
+      axios.get("/admin/train-carriage/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize,

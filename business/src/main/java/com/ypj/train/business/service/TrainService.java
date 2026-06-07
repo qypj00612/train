@@ -2,6 +2,12 @@ package com.ypj.train.business.service;
 
 import com.ypj.train.business.domain.Train;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ypj.train.business.req.TrainQueryReq;
+import com.ypj.train.business.req.TrainSaveReq;
+import com.ypj.train.business.resp.TrainQueryResp;
+import com.ypj.train.common.resp.PageResp;
+
+import java.util.List;
 
 /**
 * @author Ypj
@@ -10,4 +16,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface TrainService extends IService<Train> {
 
+    PageResp<TrainQueryResp> queryList(TrainQueryReq req);
+
+    void save(TrainSaveReq req);
+
+    List<TrainQueryResp> queryAll();
 }

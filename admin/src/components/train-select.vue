@@ -2,8 +2,8 @@
   <a-select v-model:value="trainCode" show-search allow-clear :filter-option="filterTrainCodeOption" @change="onChange"
             placeholder="请选择车次" :style="'width:' + localWidth">
     <a-select-option v-for="item in trains" :key="item.code" :value="item.code"
-                     :label="item.code + item.departure + item.destination">
-      {{ item.code }} {{ item.departure }} ~ {{ item.destination }}
+                     :label="item.code + item.start + item.end">
+      {{ item.code }} {{ item.start }} ~ {{ item.end }}
     </a-select-option>
   </a-select>
 </template>
@@ -41,7 +41,7 @@ export default defineComponent({
         trains.value = list;
       }
       else {
-        axios.get("/business/admin/train/query-all").then((response) => {
+        axios.get("/admin/train/query-all").then((response) => {
           let data = response.data;
           if (data.success) {
             trains.value = data.content;

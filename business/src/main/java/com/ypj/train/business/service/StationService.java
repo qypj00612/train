@@ -7,6 +7,8 @@ import com.ypj.train.business.req.StationSaveReq;
 import com.ypj.train.business.resp.StationQueryResp;
 import com.ypj.train.common.resp.PageResp;
 
+import java.util.List;
+
 /**
 * @author Ypj
 * @description 针对表【station(车站)】的数据库操作Service
@@ -17,4 +19,6 @@ public interface StationService extends IService<Station> {
     void save(StationSaveReq req);
 
     PageResp<StationQueryResp> queryList(StationQueryReq req);
+
+    List<StationQueryResp> queryAll();
 }

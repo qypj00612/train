@@ -1,6 +1,7 @@
 package com.ypj.train.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,6 +13,8 @@ import com.ypj.train.business.req.StationSaveReq;
 import com.ypj.train.business.resp.StationQueryResp;
 import com.ypj.train.business.service.StationService;
 import com.ypj.train.business.mapper.StationMapper;
+import com.ypj.train.common.exception.BusinessException;
+import com.ypj.train.common.exception.enums.BusinessExceptionEnum;
 import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.common.util.SnowUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +41,12 @@ public class StationServiceImpl extends ServiceImpl<StationMapper, Station>
         DateTime now = DateTime.now();
         Station station = BeanUtil.copyProperties(req, Station.class);
         if(ObjectUtil.isNull(station.getId())){
+
+            Station station1 = selectByUnique(req.getName());
+            if(ObjectUtil.isNotNull(station1)){
+                throw new BusinessException(BusinessExceptionEnum.STATION_EXIST);
+            }
+
             station.setId(SnowUtil.getSnowTime());
             station.setCreateTime(now);
             station.setUpdateTime(now);
@@ -67,6 +76,23 @@ public class StationServiceImpl extends ServiceImpl<StationMapper, Station>
         pageResp.setTotal(page.getTotal());
 
         return pageResp;
+    }
+
+    @Override
+    public List<StationQueryResp> queryAll() {
+        LambdaQueryWrapper<Station> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        List<Station> stations = stationMapper.selectList(lambdaQueryWrapper);
+        return BeanUtil.copyToList(stations, StationQueryResp.class);
+    }
+
+    public Station selectByUnique(String unique) {
+        LambdaQueryWrapper<Station> eq = new LambdaQueryWrapper<Station>()
+                .eq(Station::getName, unique);
+        List<Station> stations = stationMapper.selectList(eq);
+        if(CollUtil.isNotEmpty(stations)){
+            return stations.get(0);
+        }
+        return null;
     }
 }
 

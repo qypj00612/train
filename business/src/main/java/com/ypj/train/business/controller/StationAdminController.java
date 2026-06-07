@@ -6,9 +6,11 @@ import com.ypj.train.business.resp.StationQueryResp;
 import com.ypj.train.business.service.StationService;
 import com.ypj.train.common.resp.CommonResp;
 import com.ypj.train.common.resp.PageResp;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("admin/station")
@@ -18,17 +20,16 @@ public class StationAdminController {
     private final StationService stationService;
 
     @PostMapping("save")
-    public CommonResp<Object> save(@Validated @RequestBody StationSaveReq req){
+    public CommonResp<Object> save(@Valid @RequestBody StationSaveReq req){
         stationService.save(req);
         return new CommonResp<>();
     }
 
     @GetMapping("query-list")
-    public CommonResp<PageResp<StationQueryResp>> queryList(@Validated StationQueryReq req){
+    public CommonResp<PageResp<StationQueryResp>> queryList(@Valid StationQueryReq req){
         PageResp<StationQueryResp> pageResp = stationService.queryList(req);
         return new CommonResp<>(pageResp);
     }
-
 
     @DeleteMapping("delete/{id}")
     public CommonResp<Object> delete(@PathVariable Long id){
@@ -36,5 +37,10 @@ public class StationAdminController {
         return new CommonResp<>();
     }
 
+    @GetMapping("query-all")
+    public CommonResp<List<StationQueryResp>> queryAll(){
+        List<StationQueryResp> list = stationService.queryAll();
+        return new CommonResp<>(list);
+    }
 
 }

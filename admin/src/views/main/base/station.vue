@@ -79,8 +79,8 @@ export default defineComponent({
       },
       {
         title: '车站名拼音首字母',
-        dataIndex: 'nameInitials',
-        key: 'nameInitials',
+        dataIndex: 'namePy',
+        key: 'namePy',
       },
       {
         title: '操作',

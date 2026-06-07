@@ -41,16 +41,16 @@
         <a-input v-model:value="trainStation.namePinyin" disabled/>
       </a-form-item>
       <a-form-item label="进站时间">
-        <a-time-picker v-model:value="trainStation.entryTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
+        <a-time-picker v-model:value="trainStation.inTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
       </a-form-item>
       <a-form-item label="出站时间">
-        <a-time-picker v-model:value="trainStation.exitTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
+        <a-time-picker v-model:value="trainStation.outTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
       </a-form-item>
       <a-form-item label="停留时间">
         <a-time-picker v-model:value="trainStation.stopTime" valueFormat="HH:mm:ss" placeholder="请选择时间" disabled/>
       </a-form-item>
       <a-form-item label="里程（公里）">
-        <a-input v-model:value="trainStation.kilometers"/>
+        <a-input v-model:value="trainStation.km"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -76,10 +76,10 @@ export default defineComponent({
       index: undefined,
       name: undefined,
       namePinyin: undefined,
-      entryTime: undefined,
-      exitTime: undefined,
+      inTime: undefined,
+      outTime: undefined,
       stopTime: undefined,
-      kilometers: undefined,
+      km: undefined,
       createTime: undefined,
       updateTime: undefined,
     });
@@ -117,13 +117,13 @@ export default defineComponent({
       },
       {
         title: '进站时间',
-        dataIndex: 'entryTime',
-        key: 'entryTime',
+        dataIndex: 'inTime',
+        key: 'inTime',
       },
       {
         title: '出站时间',
-        dataIndex: 'exitTime',
-        key: 'exitTime',
+        dataIndex: 'outTime',
+        key: 'outTime',
       },
       {
         title: '停留时间',
@@ -132,8 +132,8 @@ export default defineComponent({
       },
       {
         title: '里程（公里）',
-        dataIndex: 'kilometers',
-        key: 'kilometers',
+        dataIndex: 'km',
+        key: 'km',
       },
       {
         title: '操作',
@@ -149,14 +149,14 @@ export default defineComponent({
     }, {immediate: true});
 
     // 自动计算停站时长
-    watch (() => trainStation.value.entryTime, () => {
-      let diff = dayjs(trainStation.value.exitTime, "HH:mm:ss").diff(dayjs(trainStation.value.entryTime, "HH:mm:ss"), "second");
+    watch (() => trainStation.value.inTime, () => {
+      let diff = dayjs(trainStation.value.outTime, "HH:mm:ss").diff(dayjs(trainStation.value.inTime, "HH:mm:ss"), "second");
       trainStation.value.stopTime = dayjs("00:00:00", "HH:mm:ss").second(diff).format("HH:mm:ss");
     }, {immediate: true});
 
     // 自动计算停站时长
-    watch (() => trainStation.value.exitTime, () => {
-      let diff = dayjs(trainStation.value.exitTime, "HH:mm:ss").diff(dayjs(trainStation.value.entryTime, "HH:mm:ss"), "second");
+    watch (() => trainStation.value.outTime, () => {
+      let diff = dayjs(trainStation.value.outTime, "HH:mm:ss").diff(dayjs(trainStation.value.inTime, "HH:mm:ss"), "second");
       trainStation.value.stopTime = dayjs("00:00:00", "HH:mm:ss").second(diff).format("HH:mm:ss");
     }, {immediate: true});
 
@@ -171,13 +171,13 @@ export default defineComponent({
     };
 
     const onDelete = (record) => {
-      axios.delete("/business/admin/train-station/delete/" + record.id).then((response) => {
+      axios.delete("/admin/train-station/delete/" + record.id).then((response) => {
         const data = response.data;
         if (data.success) {
           notification.success({description: "删除成功！"});
           handleQuery({
             page: pagination.value.current,
-            size: pagination.value.pageSize,
+            pageSize: pagination.value.pageSize,
           });
         } else {
           notification.error({description: data.message});
@@ -186,7 +186,7 @@ export default defineComponent({
     };
 
     const handleOk = () => {
-      axios.post("/business/admin/train-station/save", trainStation.value).then((response) => {
+      axios.post("/admin/train-station/save", trainStation.value).then((response) => {
         let data = response.data;
         if (data.success) {
           notification.success({description: "保存成功！"});
@@ -209,7 +209,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/train-station/query-list", {
+      axios.get("/admin/train-station/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize,

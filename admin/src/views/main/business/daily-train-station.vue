@@ -45,10 +45,10 @@
         <a-input v-model:value="dailyTrainStation.namePinyin" disabled/>
       </a-form-item>
       <a-form-item label="进站时间">
-        <a-time-picker v-model:value="dailyTrainStation.entryTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
+        <a-time-picker v-model:value="dailyTrainStation.inTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
       </a-form-item>
       <a-form-item label="出站时间">
-        <a-time-picker v-model:value="dailyTrainStation.exitTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
+        <a-time-picker v-model:value="dailyTrainStation.outTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
       </a-form-item>
       <a-form-item label="停站时长">
         <a-time-picker v-model:value="dailyTrainStation.stopTime" valueFormat="HH:mm:ss" placeholder="请选择时间" disabled/>
@@ -80,8 +80,8 @@ export default defineComponent({
       index: undefined,
       name: undefined,
       namePinyin: undefined,
-      entryTime: undefined,
-      exitTime: undefined,
+      inTime: undefined,
+      outTime: undefined,
       stopTime: undefined,
       km: undefined,
       createTime: undefined,
@@ -160,14 +160,14 @@ export default defineComponent({
     }, {immediate: true});
 
     // 自动计算停站时长
-    watch (() => dailyTrainStation.value.entryTime, () => {
-      let diff = dayjs(dailyTrainStation.value.exitTime, "HH:mm:ss").diff(dayjs(dailyTrainStation.value.entryTime, "HH:mm:ss"), "second");
+    watch (() => dailyTrainStation.value.inTime, () => {
+      let diff = dayjs(dailyTrainStation.value.outTime, "HH:mm:ss").diff(dayjs(dailyTrainStation.value.inTime, "HH:mm:ss"), "second");
       dailyTrainStation.value.stopTime = dayjs("00:00:00", "HH:mm:ss").second(diff).format("HH:mm:ss");
     }, {immediate: true});
 
     // 自动计算停站时长
-    watch (() => dailyTrainStation.value.exitTime, () => {
-      let diff = dayjs(dailyTrainStation.value.exitTime, "HH:mm:ss").diff(dayjs(dailyTrainStation.value.entryTime, "HH:mm:ss"), "second");
+    watch (() => dailyTrainStation.value.outTime, () => {
+      let diff = dayjs(dailyTrainStation.value.outTime, "HH:mm:ss").diff(dayjs(dailyTrainStation.value.inTime, "HH:mm:ss"), "second");
       dailyTrainStation.value.stopTime = dayjs("00:00:00", "HH:mm:ss").second(diff).format("HH:mm:ss");
     }, {immediate: true});
 

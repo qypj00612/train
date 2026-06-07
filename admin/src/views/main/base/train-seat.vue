@@ -106,7 +106,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/train-seat/query-list", {
+      axios.get("/admin/train-seat/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize,
