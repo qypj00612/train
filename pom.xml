@@ -27,6 +27,7 @@
         <module>gateway</module>
         <module>business</module>
         <module>batch</module>
+        <module>api</module>
     </modules>
     <scm>
         <connection/>

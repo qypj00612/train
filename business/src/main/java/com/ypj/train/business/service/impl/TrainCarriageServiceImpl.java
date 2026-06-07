@@ -94,6 +94,13 @@ public class TrainCarriageServiceImpl extends ServiceImpl<TrainCarriageMapper, T
         }
         return null;
     }
+
+    public List<TrainCarriage> selectByTrainCode(String trainCode) {
+        LambdaQueryWrapper<TrainCarriage> eq = new LambdaQueryWrapper<TrainCarriage>()
+                .eq(TrainCarriage::getTrainCode, trainCode);
+        return trainCarriageMapper.selectList(eq);
+    }
+
 }
 
 

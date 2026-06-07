@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("admin/daily-train-seat")
-public class DailyTrainSeatController {
+public class DailyTrainSeatAdminController {
 
     private final DailyTrainSeatService dailyTrainSeatService;
 

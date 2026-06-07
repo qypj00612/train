@@ -90,6 +90,13 @@ public class TrainStationServiceImpl extends ServiceImpl<TrainStationMapper, Tra
         }
         return null;
     }
+
+    public List<TrainStation> selectByTrainCode(String trainCode){
+        LambdaQueryWrapper<TrainStation> eq = new LambdaQueryWrapper<TrainStation>()
+                .eq(TrainStation::getTrainCode, trainCode);
+        return trainStationMapper.selectList(eq);
+    }
+
 }
 
 

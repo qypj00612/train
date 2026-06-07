@@ -8,7 +8,10 @@ import com.ypj.train.common.resp.CommonResp;
 import com.ypj.train.common.resp.PageResp;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("admin/daily-train")
@@ -32,6 +35,14 @@ public class DailyTrainAdminController {
     @DeleteMapping("delete/{id}")
     public CommonResp<Object> delete(@PathVariable Long id) {
         dailyTrainService.removeById(id);
+        return new CommonResp<>();
+    }
+
+    @GetMapping("gen-daily/{data}")
+    public CommonResp<Object> genDaily(
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) {
+        dailyTrainService.genDaily(data);
         return new CommonResp<>();
     }
 }

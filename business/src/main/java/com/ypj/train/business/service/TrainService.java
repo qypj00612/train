@@ -21,4 +21,5 @@ public interface TrainService extends IService<Train> {
     void save(TrainSaveReq req);
 
     List<TrainQueryResp> queryAll();
+
 }

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ypj.train.business.domain.DailyTrainCarriage;
+import com.ypj.train.business.domain.TrainCarriage;
 import com.ypj.train.business.enums.SeatColEnum;
 import com.ypj.train.business.mapper.DailyTrainCarriageMapper;
 import com.ypj.train.business.req.DailyTrainCarriageQueryReq;
@@ -20,7 +21,9 @@ import com.ypj.train.common.exception.enums.BusinessExceptionEnum;
 import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.common.util.SnowUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -32,10 +35,13 @@ import java.util.List;
 */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DailyTrainCarriageServiceImpl extends ServiceImpl<DailyTrainCarriageMapper, DailyTrainCarriage>
     implements DailyTrainCarriageService{
 
     private final DailyTrainCarriageMapper dailyTrainCarriageMapper;
+
+    private final TrainCarriageServiceImpl trainCarriageService;
 
     @Override
     public PageResp<DailyTrainCarriageResp> queryList(DailyTrainCarriageQueryReq req) {
@@ -103,6 +109,35 @@ public class DailyTrainCarriageServiceImpl extends ServiceImpl<DailyTrainCarriag
             return dailyTrainCarriages.get(0);
         }
         return null;
+    }
+
+    @Transactional
+    public void genDailyStation(Date date, String code) {
+        LambdaQueryWrapper<DailyTrainCarriage> eq = new LambdaQueryWrapper<DailyTrainCarriage>()
+                .eq(DailyTrainCarriage::getDate, date)
+                .eq(DailyTrainCarriage::getTrainCode, code);
+        dailyTrainCarriageMapper.delete(eq);
+
+        List<TrainCarriage> trainCarriages = trainCarriageService.selectByTrainCode(code);
+        if(CollUtil.isEmpty(trainCarriages)){
+            log.info("没有该车次的基础车厢数据，生成车次车厢结束");
+            return;
+        }
+
+        for (TrainCarriage trainCarriage : trainCarriages) {
+            DateTime now = DateTime.now();
+
+            DailyTrainCarriage dailyTrainCarriage = BeanUtil.copyProperties(trainCarriage, DailyTrainCarriage.class);
+
+            dailyTrainCarriage.setId(SnowUtil.getSnowTime());
+            dailyTrainCarriage.setDate(date);
+            dailyTrainCarriage.setCreateTime(now);
+            dailyTrainCarriage.setUpdateTime(now);
+
+            log.info("生成车次编号为【{}】的【{}】号车厢"
+                    ,code,dailyTrainCarriage.getIndex());
+            dailyTrainCarriageMapper.insert(dailyTrainCarriage);
+        }
     }
 }
 

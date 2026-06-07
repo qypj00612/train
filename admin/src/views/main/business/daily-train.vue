@@ -270,7 +270,7 @@ export default defineComponent({
     const handleGenerateDailyOK = () => {
       let date = dayjs(generateDaily.value.date).format("YYYY-MM-DD");
       generateDailyLoading.value = true;
-      axios.get("/admin/daily-train/generate-daily-train/" + date).then((response) => {
+      axios.get("/admin/daily-train/gen-daily/" + date).then((response) => {
         generateDailyLoading.value = false;
         let data = response.data;
         if (data.success) {
