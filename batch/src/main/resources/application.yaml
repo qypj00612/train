@@ -1,0 +1,6 @@
+server:
+  port: 8003
+ypj:
+  db:
+    database: train_batch
+    un: train_batch

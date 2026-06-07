@@ -8,7 +8,11 @@ public enum BusinessExceptionEnum {
     STATION_EXIST("车站名已存在"),
     TRAIN_CARRIAGE_EXIST("车厢已存在"),
     TRAIN_EXIST("车次已存在"),
-    TRAIN_STATION_EXIST("车站已存在");
+    TRAIN_STATION_EXIST("车站已存在"),
+
+    DAILY_TRAIN_EXIST("今日车次已存在"),
+    DAILY_TRAIN_STATION_EXIST("今日车站已存在"),
+    DAILY_TRAIN_CARRIAGE_EXIST("今日车次车厢已存在");
 
     private String desc;
 

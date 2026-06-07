@@ -51,22 +51,22 @@
         </a-select>
       </a-form-item>
       <a-form-item label="始发站">
-        <a-input v-model:value="dailyTrain.departure"/>
+        <a-input v-model:value="dailyTrain.start"/>
       </a-form-item>
       <a-form-item label="始发站拼音">
-        <a-input v-model:value="dailyTrain.departurePinyin"/>
+        <a-input v-model:value="dailyTrain.startPinyin"/>
       </a-form-item>
       <a-form-item label="出发时间">
-        <a-time-picker v-model:value="dailyTrain.departureTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
+        <a-time-picker v-model:value="dailyTrain.startTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
       </a-form-item>
       <a-form-item label="终点站">
-        <a-input v-model:value="dailyTrain.destination"/>
+        <a-input v-model:value="dailyTrain.end"/>
       </a-form-item>
       <a-form-item label="终点站拼音">
-        <a-input v-model:value="dailyTrain.destinationPinyin"/>
+        <a-input v-model:value="dailyTrain.endPinyin"/>
       </a-form-item>
       <a-form-item label="到站时间">
-        <a-time-picker v-model:value="dailyTrain.arrivalTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
+        <a-time-picker v-model:value="dailyTrain.endTime" valueFormat="HH:mm:ss" placeholder="请选择时间"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -98,12 +98,12 @@ export default defineComponent({
       date: undefined,
       code: undefined,
       type: undefined,
-      departure: undefined,
-      departurePinyin: undefined,
-      departureTime: undefined,
-      destination: undefined,
-      destinationPinyin: undefined,
-      arrivalTime: undefined,
+      start: undefined,
+      startPinyin: undefined,
+      startTime: undefined,
+      end: undefined,
+      endPinyin: undefined,
+      endTime: undefined,
       createTime: undefined,
       updateTime: undefined,
     });
@@ -142,33 +142,33 @@ export default defineComponent({
       },
       {
         title: '始发站',
-        dataIndex: 'departure',
-        key: 'departure',
+        dataIndex: 'start',
+        key: 'start',
       },
       {
         title: '始发站拼音',
-        dataIndex: 'departurePinyin',
-        key: 'departurePinyin',
+        dataIndex: 'startPinyin',
+        key: 'startPinyin',
       },
       {
         title: '出发时间',
-        dataIndex: 'departureTime',
-        key: 'departureTime',
+        dataIndex: 'startTime',
+        key: 'startTime',
       },
       {
         title: '终点站',
-        dataIndex: 'destination',
-        key: 'destination',
+        dataIndex: 'end',
+        key: 'end',
       },
       {
         title: '终点站拼音',
-        dataIndex: 'destinationPinyin',
-        key: 'destinationPinyin',
+        dataIndex: 'endPinyin',
+        key: 'endPinyin',
       },
       {
         title: '到站时间',
-        dataIndex: 'arrivalTime',
-        key: 'arrivalTime',
+        dataIndex: 'endTime',
+        key: 'endTime',
       },
       {
         title: '操作',
@@ -187,13 +187,13 @@ export default defineComponent({
     };
 
     const onDelete = (record) => {
-      axios.delete("/business/admin/daily-train/delete/" + record.id).then((response) => {
+      axios.delete("/admin/daily-train/delete/" + record.id).then((response) => {
         const data = response.data;
         if (data.success) {
           notification.success({description: "删除成功！"});
           handleQuery({
             page: pagination.value.current,
-            size: pagination.value.pageSize,
+            pageSize: pagination.value.pageSize,
           });
         } else {
           notification.error({description: data.message});
@@ -202,7 +202,7 @@ export default defineComponent({
     };
 
     const handleOk = () => {
-      axios.post("/business/admin/daily-train/save", dailyTrain.value).then((response) => {
+      axios.post("/admin/daily-train/save", dailyTrain.value).then((response) => {
         let data = response.data;
         if (data.success) {
           notification.success({description: "保存成功！"});
@@ -225,7 +225,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/daily-train/query-list", {
+      axios.get("/admin/daily-train/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize,
@@ -270,7 +270,7 @@ export default defineComponent({
     const handleGenerateDailyOK = () => {
       let date = dayjs(generateDaily.value.date).format("YYYY-MM-DD");
       generateDailyLoading.value = true;
-      axios.get("/business/admin/daily-train/generate-daily-train/" + date).then((response) => {
+      axios.get("/admin/daily-train/generate-daily-train/" + date).then((response) => {
         generateDailyLoading.value = false;
         let data = response.data;
         if (data.success) {

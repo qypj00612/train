@@ -26,6 +26,7 @@
         <module>common</module>
         <module>gateway</module>
         <module>business</module>
+        <module>batch</module>
     </modules>
     <scm>
         <connection/>
