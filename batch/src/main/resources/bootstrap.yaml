@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: batch
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 192.168.181.128:8848
+      username: nacos
+      password: nacos
+      config:
+        file-extension: yaml
+        namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d
+        shared-configs:
+          - data-id: shared-jdbc.yaml
+      discovery:
+        namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d

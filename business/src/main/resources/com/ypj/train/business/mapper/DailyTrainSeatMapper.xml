@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ypj.train.business.mapper.DailyTrainSeatMapper">
+
+    <resultMap id="BaseResultMap" type="com.ypj.train.business.domain.DailyTrainSeat">
+            <id property="id" column="id" />
+            <result property="date" column="date" />
+            <result property="trainCode" column="train_code" />
+            <result property="carriageIndex" column="carriage_index" />
+            <result property="row" column="row" />
+            <result property="col" column="col" />
+            <result property="seatType" column="seat_type" />
+            <result property="carriageSeatIndex" column="carriage_seat_index" />
+            <result property="sell" column="sell" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,date,train_code,carriage_index,row,col,
+        seat_type,carriage_seat_index,sell,create_time,update_time
+    </sql>
+</mapper>

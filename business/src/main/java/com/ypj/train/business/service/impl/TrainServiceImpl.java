@@ -58,10 +58,13 @@ public class TrainServiceImpl extends ServiceImpl<TrainMapper, Train>
 
     @Override
     public List<TrainQueryResp> queryAll() {
+        List<Train> trains = selectAll();
+        return BeanUtil.copyToList(trains, TrainQueryResp.class);
+    }
+
+    public List<Train> selectAll() {
         LambdaQueryWrapper<Train> trainLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        List<Train> trains = trainMapper.selectList(trainLambdaQueryWrapper);
-        List<TrainQueryResp> trainQueryResps = BeanUtil.copyToList(trains, TrainQueryResp.class);
-        return trainQueryResps;
+        return trainMapper.selectList(trainLambdaQueryWrapper);
     }
 
     @Override

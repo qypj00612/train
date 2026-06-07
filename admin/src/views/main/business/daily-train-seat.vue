@@ -120,7 +120,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/daily-train-seat/query-list", {
+      axios.get("/admin/daily-train-seat/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize,

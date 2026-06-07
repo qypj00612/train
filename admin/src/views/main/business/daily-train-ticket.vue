@@ -3,8 +3,8 @@
     <a-space>
       <train-select-view v-model:value="params.trainCode" width="200px"></train-select-view>
       <a-date-picker v-model:value="params.date" valueFormat="YYYY-MM-DD" placeholder="请选择日期"></a-date-picker>
-      <station-select-view v-model:value="params.departure" width="200px"></station-select-view>
-      <station-select-view v-model:value="params.destination" width="200px"></station-select-view>
+      <station-select-view v-model:value="params.start" width="200px"></station-select-view>
+      <station-select-view v-model:value="params.end" width="200px"></station-select-view>
       <a-button type="primary" @click="handleQuery()">查询</a-button>
     </a-space>
   </p>
@@ -17,53 +17,53 @@
       <template v-if="column.dataIndex === 'action'">
       </template>
       <template v-else-if="column.dataIndex === 'station'">
-        {{record.departure}}<br/>
-        {{record.destination}}<br/>
+        {{record.start}}<br/>
+        {{record.end}}<br/>
       </template>
       <template v-else-if="column.dataIndex === 'time'">
-        {{record.departureTime}}<br/>
-        {{record.arrivalTime}}
+        {{record.startTime}}<br/>
+        {{record.end}}
       </template>
       <template v-else-if="column.dataIndex === 'duration'">
-        {{calDuration(record.departureTime, record.arrivalTime)}}<br/>
-        <div v-if="record.departureTime.replaceAll(':', '') >= record.arrivalTime.replaceAll(':', '')">
+        {{calDuration(record.startTime, record.endTime)}}<br/>
+        <div v-if="record.startTime.replaceAll(':', '') >= record.endTime.replaceAll(':', '')">
           次日到达
         </div>
         <div v-else>
           当日到达
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'firstClass'">
-        <div v-if="record.firstClass >= 0">
-          {{record.firstClass}}<br/>
-          {{record.firstClassPrice}}RMB
+      <template v-else-if="column.dataIndex === 'ydz'">
+        <div v-if="record.ydz >= 0">
+          {{record.ydz}}<br/>
+          {{record.ydzPrice}}RMB
         </div>
         <div v-else>
           --
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'secondClass'">
-        <div v-if="record.secondClass >= 0">
-          {{record.secondClass}}<br/>
-          {{record.secondClassPrice}}RMB
+      <template v-else-if="column.dataIndex === 'edz'">
+        <div v-if="record.edz >= 0">
+          {{record.edz}}<br/>
+          {{record.edzPrice}}RMB
         </div>
         <div v-else>
           --
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'softSleeper'">
-        <div v-if="record.softSleeper >= 0">
-          {{record.softSleeper}}<br/>
-          {{record.softSleeperPrice}}RMB
+      <template v-else-if="column.dataIndex === 'rw'">
+        <div v-if="record.rw >= 0">
+          {{record.rw}}<br/>
+          {{record.rwPrice}}RMB
         </div>
         <div v-else>
           --
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'hardSleeper'">
-        <div v-if="record.hardSleeper >= 0">
-          {{record.hardSleeper}}<br/>
-          {{record.hardSleeperPrice}}RMB
+      <template v-else-if="column.dataIndex === 'yw'">
+        <div v-if="record.yw >= 0">
+          {{record.yw}}<br/>
+          {{record.ywPrice}}RMB
         </div>
         <div v-else>
           --
@@ -90,22 +90,22 @@ export default defineComponent({
       id: undefined,
       date: undefined,
       trainCode: undefined,
-      departure: undefined,
-      departurePinyin: undefined,
-      departureTime: undefined,
-      departureIndex: undefined,
-      destination: undefined,
-      destinationPinyin: undefined,
-      arrivalTime: undefined,
-      arrivalIndex: undefined,
-      firstClass: undefined,
-      firstClassPrice: undefined,
-      secondClass: undefined,
-      secondClassPrice: undefined,
-      softSleeper: undefined,
-      softSleeperPrice: undefined,
-      hardSleeper: undefined,
-      hardSleeperPrice: undefined,
+      start: undefined,
+      startPinyin: undefined,
+      startTime: undefined,
+      startIndex: undefined,
+      end: undefined,
+      endPinyin: undefined,
+      endTime: undefined,
+      endIndex: undefined,
+      ydz: undefined,
+      ydzPrice: undefined,
+      edz: undefined,
+      edzPrice: undefined,
+      rw: undefined,
+      rwPrice: undefined,
+      yw: undefined,
+      ywPrice: undefined,
       createTime: undefined,
       updateTime: undefined,
     });
@@ -120,8 +120,8 @@ export default defineComponent({
     const params = ref({
       trainCode: null,
       date: null,
-      departure: null,
-      destination: null
+      start: null,
+      end: null
     });
     const columns = [
       {
@@ -188,8 +188,8 @@ export default defineComponent({
       // },
       {
         title: '一等座余票',
-        dataIndex: 'firstClass',
-        key: 'firstClass',
+        dataIndex: 'ydz',
+        key: 'ydz',
       },
       // {
       //   title: '一等座票价',
@@ -198,8 +198,8 @@ export default defineComponent({
       // },
       {
         title: '二等座余票',
-        dataIndex: 'secondClass',
-        key: 'secondClass',
+        dataIndex: 'edz',
+        key: 'edz',
       },
       // {
       //   title: '二等座票价',
@@ -208,8 +208,8 @@ export default defineComponent({
       // },
       {
         title: '软卧余票',
-        dataIndex: 'softSleeper',
-        key: 'softSleeper',
+        dataIndex: 'rw',
+        key: 'rw',
       },
       // {
       //   title: '软卧票价',
@@ -218,8 +218,8 @@ export default defineComponent({
       // },
       {
         title: '硬卧余票',
-        dataIndex: 'hardSleeper',
-        key: 'hardSleeper',
+        dataIndex: 'yw',
+        key: 'yw',
       },
       // {
       //   title: '硬卧票价',
@@ -236,14 +236,14 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/daily-train-ticket/query-list", {
+      axios.get("/admin/daily-train-ticket/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize,
           trainCode: params.value.trainCode,
           date: params.value.date,
-          departure: params.value.departure,
-          destination: params.value.destination
+          start: params.value.start,
+          end: params.value.end
         }
       }).then((response) => {
         loading.value = false;

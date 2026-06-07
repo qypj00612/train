@@ -102,6 +102,12 @@ public class TrainSeatServiceImpl extends ServiceImpl<TrainSeatMapper, TrainSeat
         pageResp.setRows(trainSeatQueryResps);
         return pageResp;
     }
+
+    public List<TrainSeat> selectByTrainCode(String trainCode) {
+        LambdaQueryWrapper<TrainSeat> eq = new LambdaQueryWrapper<TrainSeat>()
+                .eq(TrainSeat::getTrainCode, trainCode);
+        return trainSeatMapper.selectList(eq);
+    }
 }
 
 
