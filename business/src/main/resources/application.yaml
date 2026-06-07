@@ -1,0 +1,6 @@
+server:
+  port: 8002
+ypj:
+  db:
+    database: train_business
+    un: train_business
