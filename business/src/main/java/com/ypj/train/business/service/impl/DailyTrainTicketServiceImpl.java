@@ -5,6 +5,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.EnumUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -50,6 +52,19 @@ public class DailyTrainTicketServiceImpl extends ServiceImpl<DailyTrainTicketMap
     public PageResp<DailyTrainTicketQueryResp> queryList(DailyTrainTicketQueryReq req) {
         Page<DailyTrainTicket> dailyTrainTicketPage = new Page<>(req.getPage(), req.getPageSize());
         LambdaQueryWrapper<DailyTrainTicket> dailyTrainTicketLambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        if(StrUtil.isNotBlank(req.getTrainCode())){
+            dailyTrainTicketLambdaQueryWrapper.eq(DailyTrainTicket::getTrainCode, req.getTrainCode());
+        }
+        if(ObjectUtil.isNotNull(req.getDate())){
+            dailyTrainTicketLambdaQueryWrapper.eq(DailyTrainTicket::getDate, req.getDate());
+        }
+        if(StrUtil.isNotBlank(req.getStart())){
+            dailyTrainTicketLambdaQueryWrapper.eq(DailyTrainTicket::getStart, req.getStart());
+        }
+        if(StrUtil.isNotBlank(req.getEnd())){
+            dailyTrainTicketLambdaQueryWrapper.eq(DailyTrainTicket::getEnd, req.getEnd());
+        }
 
         dailyTrainTicketMapper.selectPage(dailyTrainTicketPage, dailyTrainTicketLambdaQueryWrapper);
 

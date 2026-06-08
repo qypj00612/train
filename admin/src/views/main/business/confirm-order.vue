@@ -107,7 +107,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/confirm-order/query-list", {
+      axios.get("/admin/confirm-order/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize

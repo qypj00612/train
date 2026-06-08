@@ -58,6 +58,15 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
     }
 
     @Override
+    public List<PassengerQueryResp> queryMine() {
+        LambdaQueryWrapper<Passenger> eq = new LambdaQueryWrapper<Passenger>()
+                .eq(Passenger::getMemberId, MemberContext.getId());
+
+        List<Passenger> passengers = passengerMapper.selectList(eq);
+        return BeanUtil.copyToList(passengers, PassengerQueryResp.class);
+    }
+
+    @Override
     public void save(PassengerSaveReq passengerSaveReq) {
         DateTime now = DateTime.now();
         Passenger passenger = BeanUtil.copyProperties(passengerSaveReq, Passenger.class);

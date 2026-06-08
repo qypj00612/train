@@ -2,8 +2,8 @@
   <p>
     <a-space>
       <a-date-picker v-model:value="params.date" valueFormat="YYYY-MM-DD" :disabled-date="disabledDate" placeholder="请选择日期"></a-date-picker>
-      <station-select-view v-model:value="params.departure" width="200px"></station-select-view>
-      <station-select-view v-model:value="params.destination" width="200px"></station-select-view>
+      <station-select-view v-model:value="params.start" width="200px"></station-select-view>
+      <station-select-view v-model:value="params.end" width="200px"></station-select-view>
       <a-button type="primary" @click="handleQuery()">查询</a-button>
     </a-space>
   </p>
@@ -21,10 +21,10 @@
             query: {
               date: record.date,
               trainCode: record.trainCode,
-              departure: record.departure,
-              departureIndex: record.departureIndex,
-              destination: record.destination,
-              arrivalIndex: record.arrivalIndex
+              start: record.start,
+              startIndex: record.startIndex,
+              end: record.end,
+              endIndex: record.endIndex
             }
           }">
             <a-button type="primary">座位销售图</a-button>
@@ -33,53 +33,53 @@
         </a-space>
       </template>
       <template v-else-if="column.dataIndex === 'station'">
-        {{ record.departure }}<br/>
-        {{ record.destination }}<br/>
+        {{ record.start }}<br/>
+        {{ record.end }}<br/>
       </template>
       <template v-else-if="column.dataIndex === 'time'">
-        {{ record.departureTime }}<br/>
-        {{ record.arrivalTime }}
+        {{ record.startTime }}<br/>
+        {{ record.endTime }}
       </template>
       <template v-else-if="column.dataIndex === 'duration'">
-        {{ calDuration(record.departureTime, record.arrivalTime) }}<br/>
-        <div v-if="record.departureTime.replaceAll(':', '') >= record.arrivalTime.replaceAll(':', '')">
+        {{ calDuration(record.startTime, record.endTime) }}<br/>
+        <div v-if="record.startTime.replaceAll(':', '') >= record.endTime.replaceAll(':', '')">
           次日到达
         </div>
         <div v-else>
           当日到达
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'firstClass'">
-        <div v-if="record.firstClass >= 0">
-          {{ record.firstClass }}<br/>
-          {{ record.firstClassPrice }}RMB
+      <template v-else-if="column.dataIndex === 'ydz'">
+        <div v-if="record.ydz >= 0">
+          {{ record.ydz }}<br/>
+          {{ record.ydzPrice }}￥
         </div>
         <div v-else>
           --
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'secondClass'">
-        <div v-if="record.secondClass >= 0">
-          {{ record.secondClass }}<br/>
-          {{ record.secondClassPrice }}RMB
+      <template v-else-if="column.dataIndex === 'edz'">
+        <div v-if="record.edz >= 0">
+          {{ record.edz }}<br/>
+          {{ record.edzPrice }}￥
         </div>
         <div v-else>
           --
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'softSleeper'">
-        <div v-if="record.softSleeper >= 0">
-          {{ record.softSleeper }}<br/>
-          {{ record.softSleeperPrice }}RMB
+      <template v-else-if="column.dataIndex === 'rw'">
+        <div v-if="record.rw >= 0">
+          {{ record.rw }}<br/>
+          {{ record.rwPrice }}￥
         </div>
         <div v-else>
           --
         </div>
       </template>
-      <template v-else-if="column.dataIndex === 'hardSleeper'">
-        <div v-if="record.hardSleeper >= 0">
-          {{ record.hardSleeper }}<br/>
-          {{ record.hardSleeperPrice }}RMB
+      <template v-else-if="column.dataIndex === 'yw'">
+        <div v-if="record.yw >= 0">
+          {{ record.yw }}<br/>
+          {{ record.ywPrice }}￥
         </div>
         <div v-else>
           --
@@ -128,22 +128,22 @@ export default defineComponent({
       id: undefined,
       date: undefined,
       trainCode: undefined,
-      departure: undefined,
-      departurePinyin: undefined,
-      departureTime: undefined,
-      departureIndex: undefined,
-      destination: undefined,
-      destinationPinyin: undefined,
-      arrivalTime: undefined,
-      arrivalIndex: undefined,
-      firstClass: undefined,
-      firstClassPrice: undefined,
-      secondClass: undefined,
-      secondClassPrice: undefined,
-      softSleeper: undefined,
-      softSleeperPrice: undefined,
-      hardSleeper: undefined,
-      hardSleeperPrice: undefined,
+      start: undefined,
+      startPinyin: undefined,
+      startTime: undefined,
+      startIndex: undefined,
+      end: undefined,
+      endPinyin: undefined,
+      endTime: undefined,
+      endIndex: undefined,
+      ydz: undefined,
+      ydzPrice: undefined,
+      edz: undefined,
+      edzPrice: undefined,
+      rw: undefined,
+      rwPrice: undefined,
+      yw: undefined,
+      ywPrice: undefined,
       createTime: undefined,
       updateTime: undefined,
     });
@@ -157,8 +157,8 @@ export default defineComponent({
     let loading = ref(false);
     const params = ref({
       date: null,
-      departure: null,
-      destination: null
+      start: null,
+      end: null
     });
     const columns = [
       {
@@ -183,23 +183,23 @@ export default defineComponent({
       },
       {
         title: '一等座',
-        dataIndex: 'firstClass',
-        key: 'firstClass',
+        dataIndex: 'ydz',
+        key: 'ydz',
       },
       {
         title: '二等座',
-        dataIndex: 'secondClass',
-        key: 'secondClass',
+        dataIndex: 'edz',
+        key: 'edz',
       },
       {
         title: '软卧',
-        dataIndex: 'softSleeper',
-        key: 'softSleeper',
+        dataIndex: 'rw',
+        key: 'rw',
       },
       {
         title: '硬卧',
-        dataIndex: 'hardSleeper',
-        key: 'hardSleeper',
+        dataIndex: 'yw',
+        key: 'yw',
       },
       {
         title: '操作',
@@ -212,11 +212,11 @@ export default defineComponent({
         notification.error({description: "请输入日期"});
         return;
       }
-      if (Tool.isEmpty(params.value.departure)) {
+      if (Tool.isEmpty(params.value.start)) {
         notification.error({description: "请输入出发地"});
         return;
       }
-      if (Tool.isEmpty(params.value.destination)) {
+      if (Tool.isEmpty(params.value.end)) {
         notification.error({description: "请输入目的地"});
         return;
       }
@@ -234,8 +234,8 @@ export default defineComponent({
           page: param.page,
           pageSize: param.pageSize,
           date: params.value.date,
-          departure: params.value.departure,
-          destination: params.value.destination
+          start: params.value.start,
+          end: params.value.end
         }
       }).then((response) => {
         loading.value = false;
@@ -298,7 +298,7 @@ export default defineComponent({
     // 判断是否过期
     const isExpire = (record) => {
       // 标准时间：2000/01/01 00:00:00
-      let departureDateTimeString = record.date.replace(/-/g, "/") + " " + record.departureTime;
+      let departureDateTimeString = record.date.replace(/-/g, "/") + " " + record.startTime;
       let departureDateTime = new Date(departureDateTimeString);
 
       //当前时间

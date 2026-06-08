@@ -7,6 +7,8 @@ import com.ypj.train.member.req.PassengerQueryReq;
 import com.ypj.train.member.req.PassengerSaveReq;
 import com.ypj.train.member.resp.PassengerQueryResp;
 
+import java.util.List;
+
 /**
 * @author Ypj
 * @description 针对表【passenger(乘车人)】的数据库操作Service
@@ -17,4 +19,6 @@ public interface PassengerService extends IService<Passenger> {
     void save(PassengerSaveReq passengerSaveReq);
 
     PageResp<PassengerQueryResp> queryList(PassengerQueryReq passengerQueryReq);
+
+    List<PassengerQueryResp> queryMine();
 }
