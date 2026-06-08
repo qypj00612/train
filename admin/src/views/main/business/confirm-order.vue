@@ -39,8 +39,8 @@ export default defineComponent({
       memberId: undefined,
       date: undefined,
       trainCode: undefined,
-      departure: undefined,
-      destination: undefined,
+      start: undefined,
+      end: undefined,
       dailyTrainTicketId: undefined,
       tickets: undefined,
       status: undefined,
@@ -73,13 +73,13 @@ export default defineComponent({
       },
       {
         title: '出发站',
-        dataIndex: 'departure',
-        key: 'departure',
+        dataIndex: 'start',
+        key: 'start',
       },
       {
         title: '到达站',
-        dataIndex: 'destination',
-        key: 'destination',
+        dataIndex: 'end',
+        key: 'end',
       },
       {
         title: '余票ID',

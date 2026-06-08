@@ -135,19 +135,19 @@
     <a-button type="primary" danger block @click="validFirstImageCode">提交验证码</a-button>
   </a-modal> -->
 
-  <a-modal v-model:visible="lineModalVisible" title="排队购票" :footer="null" :maskClosable="false" :closable="false"
-           style="top: 50px; width: 400px">
-    <div class="book-line">
-      <div v-show="confirmOrderLineCount < 0">
-        <loading-outlined /> 系统正在处理中...
-      </div>
-      <div v-show="confirmOrderLineCount >= 0">
-        <loading-outlined /> 您前面还有{{confirmOrderLineCount}}位用户在购票，排队中，请稍候
-      </div>
-    </div>
-    <br/>
-    <a-button type="primary" danger @click="onCancelOrder">取消购票</a-button>
-  </a-modal>
+<!--  <a-modal v-model:visible="lineModalVisible" title="排队购票" :footer="null" :maskClosable="false" :closable="false"-->
+<!--           style="top: 50px; width: 400px">-->
+<!--    <div class="book-line">-->
+<!--      <div v-show="confirmOrderLineCount < 0">-->
+<!--        <loading-outlined /> 系统正在处理中...-->
+<!--      </div>-->
+<!--      <div v-show="confirmOrderLineCount >= 0">-->
+<!--        <loading-outlined /> 您前面还有{{confirmOrderLineCount}}位用户在购票，排队中，请稍候-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <br/>-->
+<!--    <a-button type="primary" danger @click="onCancelOrder">取消购票</a-button>-->
+<!--  </a-modal>-->
 </template>
 
 <script>
@@ -380,7 +380,7 @@ export default defineComponent({
           visible.value = false;
           lineModalVisible.value = true;
           confirmOrderId.value = data.content;
-          queryLineCount();
+          //queryLineCount();
         } else {
           notification.error({description: data.message});
         }
@@ -483,24 +483,24 @@ export default defineComponent({
     /**
      * 取消排队
      */
-    const onCancelOrder = () => {
-      axios.get("/business/confirm-order/cancel/" + confirmOrderId.value).then((response) => {
-        let data = response.data;
-        if (data.success) {
-          let result = data.content;
-          if (result === 1) {
-            notification.success({description: "取消成功！"});
-            // 取消成功时，不用再轮询排队结果
-            clearInterval(queryLineCountInterval);
-            lineModalVisible.value = false;
-          } else {
-            notification.error({description: "取消失败！"});
-          }
-        } else {
-          notification.error({description: data.message});
-        }
-      });
-    };
+    // const onCancelOrder = () => {
+    //   axios.get("/business/confirm-order/cancel/" + confirmOrderId.value).then((response) => {
+    //     let data = response.data;
+    //     if (data.success) {
+    //       let result = data.content;
+    //       if (result === 1) {
+    //         notification.success({description: "取消成功！"});
+    //         // 取消成功时，不用再轮询排队结果
+    //         clearInterval(queryLineCountInterval);
+    //         lineModalVisible.value = false;
+    //       } else {
+    //         notification.error({description: "取消失败！"});
+    //       }
+    //     } else {
+    //       notification.error({description: data.message});
+    //     }
+    //   });
+    // };
 
     onMounted(() => {
       handleQueryPassenger();
@@ -537,7 +537,7 @@ export default defineComponent({
       // loadImageCode,
       // showFirstImageCodeModal,
       // validFirstImageCode,
-      onCancelOrder
+      // onCancelOrder
     };
   },
 });
