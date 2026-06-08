@@ -148,6 +148,20 @@ public class DailyTrainTicketServiceImpl extends ServiceImpl<DailyTrainTicketMap
             }
         }
     }
+
+    public DailyTrainTicket queryByUnique(Date date, String code, String start, String end) {
+        LambdaQueryWrapper<DailyTrainTicket> eq = new LambdaQueryWrapper<DailyTrainTicket>()
+                .eq(DailyTrainTicket::getDate, DateUtil.beginOfDay(date))
+                .eq(DailyTrainTicket::getTrainCode, code)
+                .eq(DailyTrainTicket::getStart, start)
+                .eq(DailyTrainTicket::getEnd, end);
+
+        List<DailyTrainTicket> dailyTrainTickets = dailyTrainTicketMapper.selectList(eq);
+        if(CollUtil.isNotEmpty(dailyTrainTickets)){
+            return dailyTrainTickets.get(0);
+        }
+        return null;
+    }
 }
 
 
