@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ypj.train.business.domain.ConfirmOrder;
+import com.ypj.train.business.domain.DailyTrainCarriage;
+import com.ypj.train.business.domain.DailyTrainSeat;
 import com.ypj.train.business.domain.DailyTrainTicket;
 import com.ypj.train.business.enums.ConfirmOrderStatusEnum;
 import com.ypj.train.business.enums.SeatColEnum;
@@ -30,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,6 +49,10 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
     private final ConfirmOrderMapper confirmOrderMapper;
 
     private final DailyTrainTicketServiceImpl dailyTrainTicketService;
+
+    private final DailyTrainCarriageServiceImpl dailyTrainCarriageService;
+
+    private final DailyTrainSeatServiceImpl dailyTrainSeatService;
 
     @Override
     public PageResp<ConfirmOrderQueryResp> query(ConfirmOrderQueryReq req) {
@@ -101,7 +108,6 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
         // 计算相对第一个座位的偏移值
         List<ConfirmOrderTicketSaveReq> tickets = req.getTickets();
         ConfirmOrderTicketSaveReq ticket0 = tickets.get(0);
-        List<Integer> offset = new ArrayList<>();
 
         if(StrUtil.isNotBlank(ticket0.getSeat())){
             log.info("本次购票有选座");
@@ -123,13 +129,28 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
             }
             log.info("本次购票的绝对偏移值{}", absoluteOffset);
 
+            List<Integer> offset = new ArrayList<>();
             for (Integer i : absoluteOffset) {
                 offset.add(i-absoluteOffset.get(0));
             }
             log.info("本次座位的相对偏移值{}", offset);
 
+            getSeat(req.getDate()
+                    , req.getTrainCode()
+                    , ticket0.getSeatTypeCode()
+                    , ticket0.getSeat().split("")[0]
+                    , offset);
         }else{
             log.info("本次购票没有选座");
+
+            for (ConfirmOrderTicketSaveReq ticket : tickets) {
+                getSeat(req.getDate()
+                        , req.getTrainCode()
+                        , ticket.getSeatTypeCode()
+                        , null
+                        , null);
+            }
+
         }
 
         // 选座
@@ -148,6 +169,19 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
             // 为会员添加购票记录
 
             // 更新确认订单表为成功
+    }
+
+    // 选座
+    public void getSeat(Date date, String trainCode, String seatType, String col, List<Integer> offset){
+        List<DailyTrainCarriage> dailyTrainCarriages = dailyTrainCarriageService.selectBySeatType(date, trainCode, seatType);
+        log.info("共有{}个符合条件的车厢", dailyTrainCarriages.size());
+
+        // 一个车厢一个车厢的获取座位数据
+        for (DailyTrainCarriage dailyTrainCarriage : dailyTrainCarriages) {
+            List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatService.selectByCarriageIndex(date, trainCode, dailyTrainCarriage.getIndex());
+            log.info("{}号车厢共有座位数:{}", dailyTrainCarriage.getIndex(), dailyTrainSeats.size());
+        }
+
     }
 
     private static void reduceTicket(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
