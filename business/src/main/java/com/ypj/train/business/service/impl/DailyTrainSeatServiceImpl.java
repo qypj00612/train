@@ -120,6 +120,19 @@ public class DailyTrainSeatServiceImpl extends ServiceImpl<DailyTrainSeatMapper,
 
         return dailyTrainSeatMapper.selectList(eq);
     }
+
+    public void updateSell(DailyTrainSeat finDailyTrainSeat) {
+
+            DailyTrainSeat dailyTrainSeatDB = new DailyTrainSeat();
+            dailyTrainSeatDB.setId(finDailyTrainSeat.getId());
+            dailyTrainSeatDB.setSell(finDailyTrainSeat.getSell());
+
+            LambdaQueryWrapper<DailyTrainSeat> eq = new LambdaQueryWrapper<DailyTrainSeat>()
+                    .eq(DailyTrainSeat::getId, dailyTrainSeatDB.getId());
+
+            dailyTrainSeatMapper.update(dailyTrainSeatDB,eq);
+
+    }
 }
 
 

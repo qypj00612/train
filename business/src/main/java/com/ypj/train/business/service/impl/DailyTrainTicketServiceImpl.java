@@ -8,6 +8,7 @@ import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ypj.train.business.domain.DailyTrain;
@@ -161,6 +162,37 @@ public class DailyTrainTicketServiceImpl extends ServiceImpl<DailyTrainTicketMap
             return dailyTrainTickets.get(0);
         }
         return null;
+    }
+
+    /**
+     * 扣减余票详情库存
+     * @param date 日期
+     * @param trainCode 车次
+     * @param seatType 座位种类
+     * @param maxStartIndex 影响的最大的出发站站序
+     * @param minStartIndex 影响的最小的出发站站序
+     * @param minEndIndex 影响的最小的终点站站序
+     * @param maxEndIndex 影响的最大的终点站站序
+     */
+    public void updateTicketCount(Date date, String trainCode, String seatType, Integer maxStartIndex, Integer minStartIndex, Integer minEndIndex, Integer maxEndIndex) {
+        DateTime relDate = DateUtil.beginOfDay(date);
+        LambdaUpdateWrapper<DailyTrainTicket> eq = new LambdaUpdateWrapper<DailyTrainTicket>()
+                .ge(DailyTrainTicket::getStartIndex, minStartIndex)
+                .ge(DailyTrainTicket::getEndIndex, minEndIndex)
+                .le(DailyTrainTicket::getStartIndex, maxStartIndex)
+                .le(DailyTrainTicket::getEndIndex, maxEndIndex)
+                .eq(DailyTrainTicket::getTrainCode, trainCode)
+                .eq(DailyTrainTicket::getDate, relDate);
+        switch (seatType) {
+            case "1"-> eq.setDecrBy(DailyTrainTicket::getYdz,1);
+
+            case "2"-> eq.setDecrBy(DailyTrainTicket::getEdz,1);
+
+            case "3"-> eq.setDecrBy(DailyTrainTicket::getRw,1);
+
+            case "4"-> eq.setDecrBy(DailyTrainTicket::getYw,1);
+        }
+        dailyTrainTicketMapper.update(null, eq);
     }
 }
 
