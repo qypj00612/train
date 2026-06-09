@@ -110,6 +110,29 @@ public class DailyTrainSeatServiceImpl extends ServiceImpl<DailyTrainSeatMapper,
         Long l = dailyTrainSeatMapper.selectCount(eq);
         return Math.toIntExact(l.equals(0L) ? -1 : l);
     }
+
+    public List<DailyTrainSeat> selectByCarriageIndex(Date date, String trainCode, Integer carriageIndex) {
+        LambdaQueryWrapper<DailyTrainSeat> eq = new LambdaQueryWrapper<DailyTrainSeat>()
+                .eq(DailyTrainSeat::getDate, DateUtil.beginOfDay(date))
+                .eq(DailyTrainSeat::getTrainCode, trainCode)
+                .eq(DailyTrainSeat::getCarriageIndex, carriageIndex)
+                .orderByAsc(DailyTrainSeat::getCarriageSeatIndex);
+
+        return dailyTrainSeatMapper.selectList(eq);
+    }
+
+    public void updateSell(DailyTrainSeat finDailyTrainSeat) {
+
+            DailyTrainSeat dailyTrainSeatDB = new DailyTrainSeat();
+            dailyTrainSeatDB.setId(finDailyTrainSeat.getId());
+            dailyTrainSeatDB.setSell(finDailyTrainSeat.getSell());
+
+            LambdaQueryWrapper<DailyTrainSeat> eq = new LambdaQueryWrapper<DailyTrainSeat>()
+                    .eq(DailyTrainSeat::getId, dailyTrainSeatDB.getId());
+
+            dailyTrainSeatMapper.update(dailyTrainSeatDB,eq);
+
+    }
 }
 
 

@@ -2,11 +2,11 @@
   <div class="order-train">
     <span class="order-train-main">{{dailyTrainTicket.date}}</span>&nbsp;
     <span class="order-train-main">{{dailyTrainTicket.trainCode}}</span>次&nbsp;
-    <span class="order-train-main">{{dailyTrainTicket.departure}}</span>站
-    <span class="order-train-main">({{dailyTrainTicket.departureTime}})</span>&nbsp;
+    <span class="order-train-main">{{dailyTrainTicket.start}}</span>站
+    <span class="order-train-main">({{dailyTrainTicket.startTime}})</span>&nbsp;
     <span class="order-train-main">——</span>&nbsp;
-    <span class="order-train-main">{{dailyTrainTicket.destination}}</span>站
-    <span class="order-train-main">({{dailyTrainTicket.arrivalTime}})</span>&nbsp;
+    <span class="order-train-main">{{dailyTrainTicket.end}}</span>站
+    <span class="order-train-main">({{dailyTrainTicket.endTime}})</span>&nbsp;
 
     <div class="order-train-ticket">
       <span v-for="item in seatTypes" :key="item.type">
@@ -52,7 +52,7 @@
   <a-modal v-model:visible="visible" title="请核对以下信息"
            style="top: 50px; width: 800px"
            ok-text="确认" cancel-text="取消"
-           @ok="showFirstImageCodeModal">
+           @ok="submitOrder"> <!-- 直接提交订单，跳过验证码 -->
     <div class="order-tickets">
       <a-row class="order-tickets-header" v-if="tickets.length > 0">
         <a-col :span="3">乘客</a-col>
@@ -98,14 +98,12 @@
         体验排队购票，加入多人一起排队购票：
         <a-input-number v-model:value="lineNumber" :min="0" :max="20" />
       </div>
-      <!--<br/>-->
-      <!--最终购票：{{tickets}}-->
-      <!--最终选座：{{chooseSeatObj}}-->
     </div>
   </a-modal>
 
+  <!-- 注释掉验证码弹窗 -->
   <!-- 第二层验证码 后端 -->
-  <a-modal v-model:visible="imageCodeModalVisible" :title="null" :footer="null" :closable="false" style="top: 50px; width: 400px">
+  <!-- <a-modal v-model:visible="imageCodeModalVisible" :title="null" :footer="null" :closable="false" style="top: 50px; width: 400px">
     <p style="text-align: center; font-weight: bold; font-size: 18px">
       使用服务端验证码削弱瞬时高峰<br/>
       防止机器人刷票
@@ -118,10 +116,10 @@
       </a-input>
     </p>
     <a-button type="primary" danger block @click="handleOk">输入验证码后开始购票</a-button>
-  </a-modal>
+  </a-modal> -->
 
   <!-- 第一层验证码 纯前端 -->
-  <a-modal v-model:visible="firstImageCodeModalVisible" :title="null" :footer="null" :closable="false"
+  <!-- <a-modal v-model:visible="firstImageCodeModalVisible" :title="null" :footer="null" :closable="false"
            style="top: 50px; width: 400px">
     <p style="text-align: center; font-weight: bold; font-size: 18px">
       使用纯前端验证码削弱瞬时高峰<br/>
@@ -135,21 +133,21 @@
       </a-input>
     </p>
     <a-button type="primary" danger block @click="validFirstImageCode">提交验证码</a-button>
-  </a-modal>
+  </a-modal> -->
 
-  <a-modal v-model:visible="lineModalVisible" title="排队购票" :footer="null" :maskClosable="false" :closable="false"
-           style="top: 50px; width: 400px">
-    <div class="book-line">
-      <div v-show="confirmOrderLineCount < 0">
-        <loading-outlined /> 系统正在处理中...
-      </div>
-      <div v-show="confirmOrderLineCount >= 0">
-        <loading-outlined /> 您前面还有{{confirmOrderLineCount}}位用户在购票，排队中，请稍候
-      </div>
-    </div>
-    <br/>
-    <a-button type="primary" danger @click="onCancelOrder">取消购票</a-button>
-  </a-modal>
+<!--  <a-modal v-model:visible="lineModalVisible" title="排队购票" :footer="null" :maskClosable="false" :closable="false"-->
+<!--           style="top: 50px; width: 400px">-->
+<!--    <div class="book-line">-->
+<!--      <div v-show="confirmOrderLineCount < 0">-->
+<!--        <loading-outlined /> 系统正在处理中...-->
+<!--      </div>-->
+<!--      <div v-show="confirmOrderLineCount >= 0">-->
+<!--        <loading-outlined /> 您前面还有{{confirmOrderLineCount}}位用户在购票，排队中，请稍候-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <br/>-->
+<!--    <a-button type="primary" danger @click="onCancelOrder">取消购票</a-button>-->
+<!--  </a-modal>-->
 </template>
 
 <script>
@@ -246,7 +244,7 @@ export default defineComponent({
     }, {immediate: true});
 
     const handleQueryPassenger = () => {
-      axios.get("/member/passenger/query-mine").then((response) => {
+      axios.get("/passenger/query-mine").then((response) => {
         let data = response.data;
         if (data.success) {
           passengers.value = data.content;
@@ -271,7 +269,7 @@ export default defineComponent({
       // 校验余票是否充足，购票列表中的每个座位类型，都去车次座位余票信息中，看余票是否充足
       // 前端校验不一定准，但前端校验可以减轻后端很多压力
       // 注意：这段只是校验，必须copy出seatTypesTemp变量来扣减，用原始的seatTypes去扣减，会影响真实的库存
-      let seatTypesTemp = Tool.copy(seatTypes);
+      let seatTypesTemp = JSON.parse(JSON.stringify(seatTypes)); // 替代Tool.copy
       for (let i = 0; i < tickets.value.length; i++) {
         let ticket = tickets.value[i];
         for (let j = 0; j < seatTypesTemp.length; j++) {
@@ -303,12 +301,12 @@ export default defineComponent({
         chooseSeatType.value = 0;
       } else {
         // ticketSeatTypeCodesSet.length === 1，即只选择了一种座位（不是一个座位，是一种座位）
-        if (ticketSeatTypeCodesSet[0] === SEAT_TYPE.FIRST_CLASS.code) {
+        if (ticketSeatTypeCodesSet[0] === SEAT_TYPE.YDZ.code) {
           console.log("一等座选座");
-          chooseSeatType.value = SEAT_TYPE.FIRST_CLASS.code;
-        } else if (ticketSeatTypeCodesSet[0] === SEAT_TYPE.SECOND_CLASS.code) {
+          chooseSeatType.value = SEAT_TYPE.YDZ.code;
+        } else if (ticketSeatTypeCodesSet[0] === SEAT_TYPE.EDZ.code) {
           console.log("二等座选座");
-          chooseSeatType.value = SEAT_TYPE.SECOND_CLASS.code;
+          chooseSeatType.value = SEAT_TYPE.EDZ.code;
         } else {
           console.log("不是一等座或二等座，不支持选座");
           chooseSeatType.value = 0;
@@ -336,12 +334,8 @@ export default defineComponent({
 
     };
 
-    const handleOk = () => {
-      if (Tool.isEmpty(imageCode.value)) {
-        notification.error({description: '验证码不能为空'});
-        return;
-      }
-
+    // 直接提交订单（跳过验证码）
+    const submitOrder = () => {
       console.log("选好的座位：", chooseSeatObj.value);
 
       // 设置每张票的座位
@@ -373,26 +367,25 @@ export default defineComponent({
         dailyTrainTicketId: dailyTrainTicket.id,
         date: dailyTrainTicket.date,
         trainCode: dailyTrainTicket.trainCode,
-        departure: dailyTrainTicket.departure,
-        destination: dailyTrainTicket.destination,
+        start: dailyTrainTicket.start,
+        end: dailyTrainTicket.end,
         tickets: tickets.value,
-        imageCodeToken: imageCodeToken.value,
-        imageCode: imageCode.value,
+        // 注释掉验证码相关参数
+        // imageCodeToken: imageCodeToken.value,
+        // imageCode: imageCode.value,
         lineNumber: lineNumber.value
       }).then((response) => {
         let data = response.data;
         if (data.success) {
-          // notification.success({description: "下单成功！"});
           visible.value = false;
-          imageCodeModalVisible.value = false;
           lineModalVisible.value = true;
           confirmOrderId.value = data.content;
-          queryLineCount();
+          //queryLineCount();
         } else {
           notification.error({description: data.message});
         }
       });
-    }
+    };
 
     /* ------------------- 定时查询订单状态 --------------------- */
     // 确认订单后定时查询
@@ -432,81 +425,82 @@ export default defineComponent({
       }, 500);
     };
 
-    /* ------------------- 第二层验证码 --------------------- */
-    const imageCodeModalVisible = ref();
-    const imageCodeToken = ref();
-    const imageCodeSrc = ref();
-    const imageCode = ref();
-    /**
-     * 加载图形验证码
-     */
-    const loadImageCode = () => {
-      imageCodeToken.value = Tool.uuid(8);
-      imageCodeSrc.value = process.env.VUE_APP_SERVER + '/business/kaptcha/image-code/' + imageCodeToken.value;
-    };
+    /* ------------------- 注释掉验证码相关逻辑 --------------------- */
+    // /* ------------------- 第二层验证码 --------------------- */
+    // const imageCodeModalVisible = ref();
+    // const imageCodeToken = ref();
+    // const imageCodeSrc = ref();
+    // const imageCode = ref();
+    // /**
+    //  * 加载图形验证码
+    //  */
+    //  const loadImageCode = () => {
+    //   imageCodeToken.value = Tool.uuid(8);
+    //   imageCodeSrc.value = process.env.VUE_APP_SERVER + '/business/kaptcha/image-code/' + imageCodeToken.value;
+    // };
 
-    const showImageCodeModal = () => {
-      loadImageCode();
-      imageCodeModalVisible.value = true;
-    };
+    // const showImageCodeModal = () => {
+    //   loadImageCode();
+    //   imageCodeModalVisible.value = true;
+    // };
 
-    /* ------------------- 第一层验证码 --------------------- */
-    const firstImageCodeSourceA = ref();
-    const firstImageCodeSourceB = ref();
-    const firstImageCodeTarget = ref();
-    const firstImageCodeModalVisible = ref();
+    // /* ------------------- 第一层验证码 --------------------- */
+    // const firstImageCodeSourceA = ref();
+    // const firstImageCodeSourceB = ref();
+    // const firstImageCodeTarget = ref();
+    // const firstImageCodeModalVisible = ref();
 
-    /**
-     * 加载第一层验证码
-     */
-    const loadFirstImageCode = () => {
-      // 获取1~10的数：Math.floor(Math.random()*10 + 1)
-      firstImageCodeSourceA.value = Math.floor(Math.random()*10 + 1) + 10;
-      firstImageCodeSourceB.value = Math.floor(Math.random()*10 + 1) + 20;
-    };
+    // /**
+    //  * 加载第一层验证码
+    //  */
+    // const loadFirstImageCode = () => {
+    //   // 获取1~10的数：Math.floor(Math.random()*10 + 1)
+    //   firstImageCodeSourceA.value = Math.floor(Math.random()*10 + 1) + 10;
+    //   firstImageCodeSourceB.value = Math.floor(Math.random()*10 + 1) + 20;
+    // };
 
-    /**
-     * 显示第一层验证码弹出框
-     */
-    const showFirstImageCodeModal = () => {
-      loadFirstImageCode();
-      firstImageCodeModalVisible.value = true;
-    };
+    // /**
+    //  * 显示第一层验证码弹出框
+    //  */
+    // const showFirstImageCodeModal = () => {
+    //   loadFirstImageCode();
+    //   firstImageCodeModalVisible.value = true;
+    // };
 
-    /**
-     * 校验第一层验证码
-     */
-    const validFirstImageCode = () => {
-      if (parseInt(firstImageCodeTarget.value) === parseInt(firstImageCodeSourceA.value + firstImageCodeSourceB.value)) {
-        // 第一层验证通过
-        firstImageCodeModalVisible.value = false;
-        showImageCodeModal();
-      } else {
-        notification.error({description: '验证码错误'});
-      }
-    };
+    // /**
+    //  * 校验第一层验证码
+    //  */
+    // const validFirstImageCode = () => {
+    //   if (parseInt(firstImageCodeTarget.value) === parseInt(firstImageCodeSourceA.value + firstImageCodeSourceB.value)) {
+    //     // 第一层验证通过
+    //     firstImageCodeModalVisible.value = false;
+    //     showImageCodeModal();
+    //   } else {
+    //     notification.error({description: '验证码错误'});
+    //   }
+    // };
 
     /**
      * 取消排队
      */
-    const onCancelOrder = () => {
-      axios.get("/business/confirm-order/cancel/" + confirmOrderId.value).then((response) => {
-        let data = response.data;
-        if (data.success) {
-          let result = data.content;
-          if (result === 1) {
-            notification.success({description: "取消成功！"});
-            // 取消成功时，不用再轮询排队结果
-            clearInterval(queryLineCountInterval);
-            lineModalVisible.value = false;
-          } else {
-            notification.error({description: "取消失败！"});
-          }
-        } else {
-          notification.error({description: data.message});
-        }
-      });
-    };
+    // const onCancelOrder = () => {
+    //   axios.get("/business/confirm-order/cancel/" + confirmOrderId.value).then((response) => {
+    //     let data = response.data;
+    //     if (data.success) {
+    //       let result = data.content;
+    //       if (result === 1) {
+    //         notification.success({description: "取消成功！"});
+    //         // 取消成功时，不用再轮询排队结果
+    //         clearInterval(queryLineCountInterval);
+    //         lineModalVisible.value = false;
+    //       } else {
+    //         notification.error({description: "取消失败！"});
+    //       }
+    //     } else {
+    //       notification.error({description: data.message});
+    //     }
+    //   });
+    // };
 
     onMounted(() => {
       handleQueryPassenger();
@@ -524,25 +518,26 @@ export default defineComponent({
       chooseSeatType,
       chooseSeatObj,
       SEAT_COL_ARRAY,
-      imageCodeToken,
-      imageCodeSrc,
-      imageCode,
-      imageCodeModalVisible,
-      firstImageCodeSourceA,
-      firstImageCodeSourceB,
-      firstImageCodeTarget,
-      firstImageCodeModalVisible,
+      // 注释掉验证码相关返回值
+      // imageCodeToken,
+      // imageCodeSrc,
+      // imageCode,
+      // imageCodeModalVisible,
+      // firstImageCodeSourceA,
+      // firstImageCodeSourceB,
+      // firstImageCodeTarget,
+      // firstImageCodeModalVisible,
       lineModalVisible,
       confirmOrderId,
       confirmOrderLineCount,
       lineNumber,
       finishCheckPassenger,
-      handleOk,
-      showImageCodeModal,
-      loadImageCode,
-      showFirstImageCodeModal,
-      validFirstImageCode,
-      onCancelOrder
+      submitOrder, // 替换原handleOk为submitOrder
+      // showImageCodeModal,
+      // loadImageCode,
+      // showFirstImageCodeModal,
+      // validFirstImageCode,
+      // onCancelOrder
     };
   },
 });

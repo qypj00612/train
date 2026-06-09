@@ -12,7 +12,9 @@ public enum BusinessExceptionEnum {
 
     DAILY_TRAIN_EXIST("今日车次已存在"),
     DAILY_TRAIN_STATION_EXIST("今日车站已存在"),
-    DAILY_TRAIN_CARRIAGE_EXIST("今日车次车厢已存在");
+    DAILY_TRAIN_CARRIAGE_EXIST("今日车次车厢已存在"),
+
+    CONFiRM_ORDER_TICKET_ERROR("余票数量不足");
 
     private String desc;
 

@@ -3,6 +3,7 @@ package com.ypj.train.business.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -138,6 +139,15 @@ public class DailyTrainCarriageServiceImpl extends ServiceImpl<DailyTrainCarriag
                     ,code,dailyTrainCarriage.getIndex());
             dailyTrainCarriageMapper.insert(dailyTrainCarriage);
         }
+    }
+
+    public List<DailyTrainCarriage> selectBySeatType(Date date, String trainCode, String seatType){
+        LambdaQueryWrapper<DailyTrainCarriage> eq = new LambdaQueryWrapper<DailyTrainCarriage>()
+                .eq(DailyTrainCarriage::getDate, DateUtil.beginOfDay(date))
+                .eq(DailyTrainCarriage::getTrainCode, trainCode)
+                .eq(DailyTrainCarriage::getSeatType, seatType);
+
+        return dailyTrainCarriageMapper.selectList(eq);
     }
 }
 

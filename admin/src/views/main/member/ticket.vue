@@ -47,15 +47,15 @@
                 memberId: undefined,
                 passengerId: undefined,
                 passengerName: undefined,
-                trainDate: undefined,
+                date: undefined,
                 trainCode: undefined,
                 carriageIndex: undefined,
-                seatRow: undefined,
-                seatCol: undefined,
-                departureStation: undefined,
-                departureTime: undefined,
-                destinationStation: undefined,
-                arrivalTime: undefined,
+                row: undefined,
+                col: undefined,
+                start: undefined,
+                startTime: undefined,
+                end: undefined,
+                endTime: undefined,
                 seatType: undefined,
                 createTime: undefined,
                 updateTime: undefined,
@@ -86,8 +86,8 @@
                 },
                 {
                     title: '日期',
-                    dataIndex: 'trainDate',
-                    key: 'trainDate',
+                    dataIndex: 'date',
+                    key: 'date',
                 },
                 {
                     title: '车次编号',
@@ -101,33 +101,33 @@
                 },
                 {
                     title: '排号',
-                    dataIndex: 'seatRow',
-                    key: 'seatRow',
+                    dataIndex: 'row',
+                    key: 'row',
                 },
                 {
                     title: '列号',
-                    dataIndex: 'seatCol',
-                    key: 'seatCol',
+                    dataIndex: 'col',
+                    key: 'col',
                 },
                 {
                     title: '出发站',
-                    dataIndex: 'departureStation',
-                    key: 'departureStation',
+                    dataIndex: 'start',
+                    key: 'start',
                 },
                 {
                     title: '出发时间',
-                    dataIndex: 'departureTime',
-                    key: 'departureTime',
+                    dataIndex: 'startTime',
+                    key: 'startTime',
                 },
                 {
                     title: '到达站',
-                    dataIndex: 'destinationStation',
-                    key: 'destinationStation',
+                    dataIndex: 'end',
+                    key: 'end',
                 },
                 {
                     title: '到站时间',
-                    dataIndex: 'arrivalTime',
-                    key: 'arrivalTime',
+                    dataIndex: 'endTime',
+                    key: 'endTime',
                 },
                 {
                     title: '座位类型',
@@ -145,7 +145,7 @@
                     };
                 }
                 loading.value = true;
-                axios.get("/member/admin/ticket/query-list", {
+                axios.get("/admin/ticket/query-list", {
                     params: {
                         page: param.page,
                         pageSize: param.pageSize

@@ -16,6 +16,18 @@
           <user-outlined></user-outlined>&nbsp; 关于
         </router-link>
       </a-menu-item>
+      <a-sub-menu key="member">
+        <template #title>
+          <span>
+            <UnorderedListOutlined></UnorderedListOutlined>会员管理
+          </span>
+        </template>
+        <a-menu-item key="/member/ticket">
+          <router-link to="/member/ticket">
+            <user-outlined></user-outlined>  会员车票
+          </router-link>
+        </a-menu-item>
+      </a-sub-menu>
       <a-sub-menu key="business">
         <template #title>
           <span>

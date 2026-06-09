@@ -1,4 +1,4 @@
-package com.ypj.train.business.controller;
+package com.ypj.train.business.controller.admin;
 
 import com.ypj.train.business.req.DailyTrainQueryReq;
 import com.ypj.train.business.req.DailyTrainSaveReq;

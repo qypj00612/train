@@ -1,4 +1,4 @@
-package com.ypj.train.business.controller;
+package com.ypj.train.business.controller.admin;
 
 import com.ypj.train.business.req.TrainSeatQueryReq;
 import com.ypj.train.business.resp.TrainSeatQueryResp;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("admin/train-seat")
 @RequiredArgsConstructor
-public class TrainSeatController {
+public class TrainSeatAdminController {
 
     private final TrainSeatService trainSeatService;
 

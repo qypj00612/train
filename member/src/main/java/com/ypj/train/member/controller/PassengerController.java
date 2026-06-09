@@ -11,10 +11,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping ("passenger")
 @RequiredArgsConstructor
 public class PassengerController {
+
     private final PassengerService passengerService;
 
     @PostMapping("save")
@@ -35,4 +38,11 @@ public class PassengerController {
         passengerService.removeById(id);
         return new CommonResp<>();
     }
+
+    @GetMapping("query-mine")
+    public CommonResp<List<PassengerQueryResp>> queryMine() {
+        List<PassengerQueryResp> resps = passengerService.queryMine();
+        return new CommonResp<>(resps);
+    }
+
 }
