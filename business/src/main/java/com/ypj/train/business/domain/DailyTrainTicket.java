@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @TableName(value ="daily_train_ticket")
 @Data
-public class DailyTrainTicket {
+public class DailyTrainTicket{
     /**
      * id
      */

@@ -24,6 +24,7 @@ import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.common.util.SnowUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,7 @@ public class DailyTrainTicketServiceImpl extends ServiceImpl<DailyTrainTicketMap
     private final DailyTrainSeatServiceImpl dailyTrainSeatService;
 
     @Override
+    @Cacheable(value = "dailyTrainTicket")
     public PageResp<DailyTrainTicketQueryResp> queryList(DailyTrainTicketQueryReq req) {
         Page<DailyTrainTicket> dailyTrainTicketPage = new Page<>(req.getPage(), req.getPageSize());
         LambdaQueryWrapper<DailyTrainTicket> dailyTrainTicketLambdaQueryWrapper = new LambdaQueryWrapper<>();

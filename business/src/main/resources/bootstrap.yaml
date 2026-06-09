@@ -13,5 +13,32 @@ spring:
         namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d
         shared-configs:
           - data-id: shared-jdbc.yaml
+          - data-id: shared-redis.yaml
+          - data-id: shard-seata.yaml
       discovery:
         namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d
+    sentinel:
+      transport:
+        dashboard: localhost:8090
+      datasource:
+        nacos: # 自定义数据源名称(可随意命名)
+          nacos:
+            serverAddr: 192.168.181.128:8848 # nacos的控制台地址
+            namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d
+            group-id: DEFAULT_GROUP
+            data-id: sentinel
+            rule-type: flow
+        degrade:
+          nacos:
+            serverAddr: 192.168.181.128:8848 # nacos的控制台地址
+            namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d
+            group-id: DEFAULT_GROUP
+            data-id: sentinel-degrade
+            rule-type: degrade
+    # feign.sentinel.enabled改成true后, 启动会报注入失败, 需改成懒加载
+    openfeign:
+      lazy-attributes-resolution: true
+# sentinel默认不监控feign, 需改成true, 在簇点链路界面会显示资源
+feign:
+  sentinel:
+    enabled: true

@@ -13,5 +13,6 @@ spring:
         namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d
         shared-configs:
           - data-id: shared-jdbc.yaml
+          - data-id: shard-seata.yaml
       discovery:
         namespace: b1cf57d0-a59e-4f1f-aecb-ca221deabe5d

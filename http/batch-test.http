@@ -63,3 +63,9 @@ Content-Type: application/json
 "name": "com.ypj.train.batch.job.DailyTrainJob",
 "jobGroupName": "default"
 }
+
+
+###
+GET http://localhost:8000/batch/admin/job/hello
+Content-Type: application/json
+

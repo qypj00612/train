@@ -19,6 +19,7 @@ import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.common.util.SnowUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,6 +80,7 @@ public class StationServiceImpl extends ServiceImpl<StationMapper, Station>
     }
 
     @Override
+    @Cacheable(value = "station")
     public List<StationQueryResp> queryAll() {
         LambdaQueryWrapper<Station> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         List<Station> stations = stationMapper.selectList(lambdaQueryWrapper);

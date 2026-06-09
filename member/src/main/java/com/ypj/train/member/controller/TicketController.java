@@ -6,13 +6,16 @@ import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.member.req.TicketSaveReq;
 import com.ypj.train.member.resp.TicketQueryResp;
 import com.ypj.train.member.service.TicketService;
+import io.seata.core.context.RootContext;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("member/ticket")
+@Slf4j
 public class TicketController {
 
     private final TicketService ticketService;
@@ -30,7 +33,8 @@ public class TicketController {
     }
 
     @PostMapping("save")
-    public CommonResp<Object> save(@Valid @RequestBody TicketSaveReq req) {
+    public CommonResp<Object> save(@Valid @RequestBody TicketSaveReq req) throws Exception {
+        log.info("全局事务ID:{}", RootContext.getXID());
         ticketService.save(req);
         return new CommonResp<>();
     }
