@@ -1,7 +1,7 @@
 package com.ypj.train.member.mapper;
 
-import com.ypj.train.member.domain.Member;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ypj.train.member.domain.Member;
 
 /**
 * @author Ypj

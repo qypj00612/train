@@ -41,6 +41,17 @@
         </filter>
     </appender>
 
+    <!-- 1. 你的Mapper接口所在包（替换为实际包名），DEBUG级别输出SQL -->
+    <logger name="com.ypj.train.business.mapper" level="DEBUG" additivity="true">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TRACE_FILE"/>
+    </logger>
+    <!-- 2. MyBatis核心包日志（可选，输出更详细的SQL执行过程） -->
+    <logger name="org.apache.ibatis" level="DEBUG" additivity="true">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TRACE_FILE"/>
+    </logger>
+
     <root level="ERROR">
         <appender-ref ref="ERROR_FILE" />
     </root>
@@ -53,4 +64,5 @@
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
+
 

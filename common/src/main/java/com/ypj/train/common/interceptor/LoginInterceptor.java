@@ -16,6 +16,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("token");
+        log.info("拦截开始");
         if(StrUtil.isNotBlank(token)){
             log.info("获取登录会员token: {}", token);
             JSONObject jsonObject = JwtUtil.getJSONObject(token);

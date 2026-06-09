@@ -38,6 +38,7 @@ public class Ticket {
     /**
      * 日期
      */
+    @TableField(value = "train_date")
     private Date date;
 
     /**
@@ -53,17 +54,19 @@ public class Ticket {
     /**
      * 排号|01, 02
      */
-    @TableField(value = "`row`")
-    private String row;
+    @TableField(value = "seat_row")
+    private String seatRow;
 
     /**
      * 列号|枚举[SeatColEnum]
      */
+    @TableField(value = "seat_col")
     private String col;
 
     /**
      * 出发站
      */
+    @TableField(value = "start_station")
     private String start;
 
     /**
@@ -74,6 +77,7 @@ public class Ticket {
     /**
      * 到达站
      */
+    @TableField(value = "end_station")
     private String end;
 
     /**
@@ -115,7 +119,7 @@ public class Ticket {
             && (this.getDate() == null ? other.getDate() == null : this.getDate().equals(other.getDate()))
             && (this.getTrainCode() == null ? other.getTrainCode() == null : this.getTrainCode().equals(other.getTrainCode()))
             && (this.getCarriageIndex() == null ? other.getCarriageIndex() == null : this.getCarriageIndex().equals(other.getCarriageIndex()))
-            && (this.getRow() == null ? other.getRow() == null : this.getRow().equals(other.getRow()))
+            && (this.getSeatRow() == null ? other.getSeatRow() == null : this.getSeatRow().equals(other.getSeatRow()))
             && (this.getCol() == null ? other.getCol() == null : this.getCol().equals(other.getCol()))
             && (this.getStart() == null ? other.getStart() == null : this.getStart().equals(other.getStart()))
             && (this.getStartTime() == null ? other.getStartTime() == null : this.getStartTime().equals(other.getStartTime()))
@@ -137,7 +141,7 @@ public class Ticket {
         result = prime * result + ((getDate() == null) ? 0 : getDate().hashCode());
         result = prime * result + ((getTrainCode() == null) ? 0 : getTrainCode().hashCode());
         result = prime * result + ((getCarriageIndex() == null) ? 0 : getCarriageIndex().hashCode());
-        result = prime * result + ((getRow() == null) ? 0 : getRow().hashCode());
+        result = prime * result + ((getSeatRow() == null) ? 0 : getSeatRow().hashCode());
         result = prime * result + ((getCol() == null) ? 0 : getCol().hashCode());
         result = prime * result + ((getStart() == null) ? 0 : getStart().hashCode());
         result = prime * result + ((getStartTime() == null) ? 0 : getStartTime().hashCode());
@@ -162,7 +166,7 @@ public class Ticket {
         sb.append(", date=").append(date);
         sb.append(", trainCode=").append(trainCode);
         sb.append(", carriageIndex=").append(carriageIndex);
-        sb.append(", row=").append(row);
+        sb.append(", row=").append(seatRow);
         sb.append(", col=").append(col);
         sb.append(", start=").append(start);
         sb.append(", startTime=").append(startTime);

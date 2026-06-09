@@ -1,15 +1,17 @@
 package com.ypj.train.batch.controller;
 
+import com.ypj.train.api.client.BusinessClient;
 import com.ypj.train.batch.req.CronJobReq;
 import com.ypj.train.batch.resp.CronJobResp;
 import com.ypj.train.common.resp.CommonResp;
+import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,12 +23,20 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/batch/admin/job")
+@RequiredArgsConstructor
 public class JobController {
 
     private static Logger LOG = LoggerFactory.getLogger(JobController.class);
 
-    @Autowired
-    private SchedulerFactoryBean schedulerFactoryBean;
+    private final BusinessClient businessClient;
+
+    private final SchedulerFactoryBean schedulerFactoryBean;
+
+    @GetMapping("hello")
+    public CommonResp<String> hello() {
+        CommonResp<String> hello = businessClient.hello();
+        return hello;
+    }
 
     @RequestMapping(value = "/run")
     public CommonResp<Object> run(@RequestBody CronJobReq cronJobReq) throws SchedulerException {

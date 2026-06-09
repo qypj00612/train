@@ -1,0 +1,7 @@
+GET http://localhost:8000/admin/redis/set/123/test
+Content-Type: application/json
+
+###
+
+GET http://localhost:8000/admin/redis/get/123
+Content-Type: application/json
