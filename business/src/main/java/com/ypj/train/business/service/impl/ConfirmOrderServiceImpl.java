@@ -9,8 +9,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ypj.train.api.client.MemberClient;
 import com.ypj.train.business.domain.ConfirmOrder;
 import com.ypj.train.business.domain.DailyTrainCarriage;
 import com.ypj.train.business.domain.DailyTrainSeat;
@@ -25,6 +27,7 @@ import com.ypj.train.business.req.ConfirmOrderTicketSaveReq;
 import com.ypj.train.business.resp.ConfirmOrderQueryResp;
 import com.ypj.train.business.service.ConfirmOrderService;
 import com.ypj.train.common.context.MemberContext;
+import com.ypj.train.common.domain.TicketSaveReq;
 import com.ypj.train.common.exception.BusinessException;
 import com.ypj.train.common.exception.enums.BusinessExceptionEnum;
 import com.ypj.train.common.resp.PageResp;
@@ -57,6 +60,8 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
     private final DailyTrainCarriageServiceImpl dailyTrainCarriageService;
 
     private final DailyTrainSeatServiceImpl dailyTrainSeatService;
+
+    private final MemberClient memberClient;
 
     @Override
     public PageResp<ConfirmOrderQueryResp> query(ConfirmOrderQueryReq req) {
@@ -168,7 +173,7 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
 
         // 代理对象
         ConfirmOrderServiceImpl proxy = (ConfirmOrderServiceImpl)AopContext.currentProxy();
-        proxy.afterConfirm(dailyTrainTicket, finDailyTrainSeats);
+        proxy.afterConfirm(dailyTrainTicket, finDailyTrainSeats, req.getTickets(), confirmOrder);
 
 
             // 座位表修改售卖情况sell
@@ -179,10 +184,21 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
 
             // 更新确认订单表为成功
     }
-    // 挑选座位后事务处理
+
+    /**
+     * 挑选座位后事务处理
+     * @param dailyTrainTicket 余票信息
+     * @param finDailyTrainSeats 最终选择的座位信息
+     * @param tickets 购买的车票信息
+     * @param confirmOrder 订单信息
+     */
     @Transactional
-    public void afterConfirm(DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finDailyTrainSeats){
-        for (DailyTrainSeat finDailyTrainSeat : finDailyTrainSeats) {
+    public void afterConfirm(DailyTrainTicket dailyTrainTicket
+            , List<DailyTrainSeat> finDailyTrainSeats
+            , List<ConfirmOrderTicketSaveReq> tickets
+            , ConfirmOrder confirmOrder){
+        for (int j = 0; j < finDailyTrainSeats.size(); j++) {
+            DailyTrainSeat finDailyTrainSeat = finDailyTrainSeats.get(j);
             // 座位表修改售卖情况sell
             dailyTrainSeatService.updateSell(finDailyTrainSeat);
 
@@ -223,8 +239,37 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
                     , finDailyTrainSeat.getSeatType()
                     , maxStartIndex
                     , minStartIndex, minEndIndex, maxEndIndex);
+
+            // 为会员添加购票记录
+            TicketSaveReq ticketSaveReq = new TicketSaveReq();
+
+            ticketSaveReq.setId(SnowUtil.getSnowTime());
+            ticketSaveReq.setMemberId(MemberContext.getId());
+            ticketSaveReq.setPassengerId(tickets.get(j).getPassengerId());
+            ticketSaveReq.setPassengerName(tickets.get(j).getPassengerName());
+            ticketSaveReq.setDate(finDailyTrainSeat.getDate());
+            ticketSaveReq.setTrainCode(finDailyTrainSeat.getTrainCode());
+            ticketSaveReq.setCarriageIndex(finDailyTrainSeat.getCarriageIndex());
+            ticketSaveReq.setRow(finDailyTrainSeat.getRow());
+            ticketSaveReq.setCol(finDailyTrainSeat.getCol());
+            ticketSaveReq.setStart(dailyTrainTicket.getStart());
+            ticketSaveReq.setStartTime(dailyTrainTicket.getStartTime());
+            ticketSaveReq.setEnd(dailyTrainTicket.getEnd()) ;
+            ticketSaveReq.setEndTime(dailyTrainTicket.getEndTime());
+            ticketSaveReq.setSeatType(finDailyTrainSeat.getSeatType());
+
+            memberClient.save(ticketSaveReq);
         }
 
+        // 更新确认订单表为成功
+        ConfirmOrder updateConfirmOrder = new ConfirmOrder();
+        updateConfirmOrder.setStatus(ConfirmOrderStatusEnum.SUCCESS.getCode());
+        DateTime now = DateTime.now();
+        updateConfirmOrder.setUpdateTime(now);
+        LambdaUpdateWrapper<ConfirmOrder> eq = new LambdaUpdateWrapper<ConfirmOrder>()
+                .eq(ConfirmOrder::getId, confirmOrder.getId());
+
+        confirmOrderMapper.update(updateConfirmOrder, eq);
     }
 
     /**
@@ -238,13 +283,18 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
      * @param startIndex 起始站序号
      * @param endIndex 到达站序号
      */
-    public void getSeat(List<DailyTrainSeat> finDailyTrainSeats, Date date, String trainCode, String seatType, String col, List<Integer> offset, Integer startIndex, Integer endIndex){
-        List<DailyTrainCarriage> dailyTrainCarriages = dailyTrainCarriageService.selectBySeatType(date, trainCode, seatType);
+    public void getSeat(List<DailyTrainSeat> finDailyTrainSeats
+            , Date date, String trainCode, String seatType
+            , String col, List<Integer> offset
+            , Integer startIndex, Integer endIndex){
+        List<DailyTrainCarriage> dailyTrainCarriages = dailyTrainCarriageService
+                .selectBySeatType(date, trainCode, seatType);
         log.info("共有{}个符合条件的车厢", dailyTrainCarriages.size());
 
         // 一个车厢一个车厢的获取座位数据
         for (DailyTrainCarriage dailyTrainCarriage : dailyTrainCarriages) {
-            List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatService.selectByCarriageIndex(date, trainCode, dailyTrainCarriage.getIndex());
+            List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatService
+                    .selectByCarriageIndex(date, trainCode, dailyTrainCarriage.getIndex());
             log.info("{}号车厢共有座位数:{}", dailyTrainCarriage.getIndex(), dailyTrainSeats.size());
 
             for (DailyTrainSeat dailyTrainSeat : dailyTrainSeats) {
@@ -351,7 +401,7 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
         String finSell = NumberUtil.getBinaryStr(finSellInt);
         // 01110
         // 因为转换成字符串形式时可能会丢失前缀0, 故应补上前面的0
-        StrUtil.fillBefore(finSell, '0', sell.length());
+        finSell = StrUtil.fillBefore(finSell, '0', sell.length());
         log.info("座位{}可售, 区间{}~{}, 原售卖信息{}, 售卖区间信息{}, 最终售卖信息{}"
                 ,dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex, sell, curSell, finSell);
 
