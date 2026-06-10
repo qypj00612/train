@@ -102,11 +102,17 @@ public class DailyTrainSeatServiceImpl extends ServiceImpl<DailyTrainSeatMapper,
         }
     }
 
+    public Integer countSeat(Date date, String seatCode){
+        return countSeat(date,seatCode,null);
+    }
+
     public Integer countSeat(Date date, String seatCode, String seatType) {
         LambdaQueryWrapper<DailyTrainSeat> eq = new LambdaQueryWrapper<DailyTrainSeat>()
                 .eq(DailyTrainSeat::getDate, date)
-                .eq(DailyTrainSeat::getTrainCode, seatCode)
-                .eq(DailyTrainSeat::getSeatType, seatType);
+                .eq(DailyTrainSeat::getTrainCode, seatCode);
+        if(StrUtil.isNotBlank(seatType)){
+            eq.eq(DailyTrainSeat::getSeatType, seatType);
+        }
         Long l = dailyTrainSeatMapper.selectCount(eq);
         return Math.toIntExact(l.equals(0L) ? -1 : l);
     }

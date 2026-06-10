@@ -51,6 +51,8 @@ public class DailyTrainServiceImpl extends ServiceImpl<DailyTrainMapper, DailyTr
 
     private final DailyTrainTicketServiceImpl dailyTrainTicketService;
 
+    private final SkTokenServiceImpl skTokenService;
+
     @Override
     public PageResp<DailyTrainQueryResp> queryList(DailyTrainQueryReq req) {
         Page<DailyTrain> dailyTrainPage = new Page<>(req.getPage(), req.getPageSize());
@@ -158,6 +160,9 @@ public class DailyTrainServiceImpl extends ServiceImpl<DailyTrainMapper, DailyTr
 
         // 生成每日余票信息
         dailyTrainTicketService.genDailyTicket(dailyTrain,date,train.getCode());
+
+        // 生成每日令牌信息
+        skTokenService.generateSkToken(date,train.getCode());
     }
 }
 

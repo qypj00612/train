@@ -14,3 +14,13 @@ spring:
       key-prefix: train_cache_
       cache-null-values: false
       time-to-live: 60s
+rocketmq:
+  name-server: 192.168.181.128:9876
+  producer:
+    group: default
+    send-message-timeout: 15000  # 延长到15秒，适配容器
+    retry-times-when-send-failed: 5  # 增加重试
+    retry-times-when-send-async-failed: 5
+    max-message-size: 4194304  # 增大消息体限制（避免大消息被拒绝）
+  consumer:
+    pull-batch-size: 10000
