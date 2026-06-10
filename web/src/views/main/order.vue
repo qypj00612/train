@@ -137,6 +137,8 @@
     <a-button type="primary" danger block @click="validFirstImageCode">提交验证码</a-button>
   </a-modal>
 
+  <!-- 注释排队购票弹窗：start -->
+  <!--
   <a-modal v-model:visible="lineModalVisible" title="排队购票" :footer="null" :maskClosable="false" :closable="false"
            style="top: 50px; width: 400px">
     <div class="book-line">
@@ -150,6 +152,8 @@
     <br/>
     <a-button type="primary" danger @click="onCancelOrder">取消购票</a-button>
   </a-modal>
+  -->
+  <!-- 注释排队购票弹窗：end -->
 </template>
 
 <script>
@@ -204,9 +208,11 @@ export default defineComponent({
     const tickets = ref([]);
     const PASSENGER_TYPE_ARRAY = window.PASSENGER_TYPE_ARRAY;
     const visible = ref(false);
-    const lineModalVisible = ref(false);
-    const confirmOrderId = ref();
-    const confirmOrderLineCount = ref(-1);
+    // 注释排队相关变量：start
+    // const lineModalVisible = ref(false);
+    // const confirmOrderId = ref();
+    // const confirmOrderLineCount = ref(-1);
+    // 注释排队相关变量：end
     const lineNumber = ref(5);
 
     // 勾选或去掉某个乘客时，在购票列表中加上或去掉一张表
@@ -386,52 +392,58 @@ export default defineComponent({
           // notification.success({description: "下单成功！"});
           visible.value = false;
           imageCodeModalVisible.value = false;
-          lineModalVisible.value = true;
-          confirmOrderId.value = data.content;
-          queryLineCount();
+          // 注释排队弹窗展示：start
+          // lineModalVisible.value = true;
+          // confirmOrderId.value = data.content;
+          // queryLineCount();
+          // 注释排队弹窗展示：end
+          // 新增：直接提示购票成功（替代排队逻辑）
+          notification.success({description: "购票成功！"});
         } else {
           notification.error({description: data.message});
         }
       });
     }
 
-    /* ------------------- 定时查询订单状态 --------------------- */
+    /* ------------------- 注释定时查询订单状态：start --------------------- */
     // 确认订单后定时查询
-    let queryLineCountInterval;
+    // let queryLineCountInterval;
 
     // 定时查询订单结果/排队数量
-    const queryLineCount = () => {
-      confirmOrderLineCount.value = -1;
-      queryLineCountInterval = setInterval(function () {
-        axios.get("/business/confirm-order/query-line-count/" + confirmOrderId.value).then((response) => {
-          let data = response.data;
-          if (data.success) {
-            let result = data.content;
-            switch (result) {
-              case -1 :
-                notification.success({description: "购票成功！"});
-                lineModalVisible.value = false;
-                clearInterval(queryLineCountInterval);
-                break;
-              case -2:
-                notification.error({description: "购票失败！"});
-                lineModalVisible.value = false;
-                clearInterval(queryLineCountInterval);
-                break;
-              case -3:
-                notification.error({description: "抱歉，没票了！"});
-                lineModalVisible.value = false;
-                clearInterval(queryLineCountInterval);
-                break;
-              default:
-                confirmOrderLineCount.value = result;
-            }
-          } else {
-            notification.error({description: data.message});
-          }
-        });
-      }, 500);
-    };
+    // const queryLineCount = () => {
+    //   confirmOrderLineCount.value = -1;
+    //   queryLineCountInterval = setInterval(function () {
+    //     axios.get("/business/confirm-order/query-line-count/" + confirmOrderId.value).then((response) => {
+    //       let data = response.data;
+    //       if (data.success) {
+    //         let result = data.content;
+    //         switch (result) {
+    //           case -1 :
+    //             notification.success({description: "购票成功！"});
+    //             lineModalVisible.value = false;
+    //             clearInterval(queryLineCountInterval);
+    //             break;
+    //           case -2:
+    //             notification.error({description: "购票失败！"});
+    //             lineModalVisible.value = false;
+    //             clea
+    //             Interval(queryLineCountInterval);
+    //             break;
+    //           case -3:
+    //             notification.error({description: "抱歉，没票了！"});
+    //             lineModalVisible.value = false;
+    //             clearInterval(queryLineCountInterval);
+    //             break;
+    //           default:
+    //             confirmOrderLineCount.value = result;
+    //         }
+    //       } else {
+    //         notification.error({description: data.message});
+    //       }
+    //     });
+    //   }, 500);
+    // };
+    /* ------------------- 注释定时查询订单状态：end --------------------- */
 
     /* ------------------- 第二层验证码 --------------------- */
     const imageCodeModalVisible = ref();
@@ -487,27 +499,29 @@ export default defineComponent({
       }
     };
 
+    /* ------------------- 注释取消排队订单方法：start --------------------- */
     /**
      * 取消排队
      */
-    const onCancelOrder = () => {
-      axios.get("/business/confirm-order/cancel/" + confirmOrderId.value).then((response) => {
-        let data = response.data;
-        if (data.success) {
-          let result = data.content;
-          if (result === 1) {
-            notification.success({description: "取消成功！"});
-            // 取消成功时，不用再轮询排队结果
-            clearInterval(queryLineCountInterval);
-            lineModalVisible.value = false;
-          } else {
-            notification.error({description: "取消失败！"});
-          }
-        } else {
-          notification.error({description: data.message});
-        }
-      });
-    };
+    // const onCancelOrder = () => {
+    //   axios.get("/business/confirm-order/cancel/" + confirmOrderId.value).then((response) => {
+    //     let data = response.data;
+    //     if (data.success) {
+    //       let result = data.content;
+    //       if (result === 1) {
+    //         notification.success({description: "取消成功！"});
+    //         // 取消成功时，不用再轮询排队结果
+    //         clearInterval(queryLineCountInterval);
+    //         lineModalVisible.value = false;
+    //       } else {
+    //         notification.error({description: "取消失败！"});
+    //       }
+    //     } else {
+    //       notification.error({description: data.message});
+    //     }
+    //   });
+    // };
+    /* ------------------- 注释取消排队订单方法：end --------------------- */
 
     onMounted(() => {
       handleQueryPassenger();
@@ -533,9 +547,11 @@ export default defineComponent({
       firstImageCodeSourceB,
       firstImageCodeTarget,
       firstImageCodeModalVisible,
-      lineModalVisible,
-      confirmOrderId,
-      confirmOrderLineCount,
+      // 注释排队相关返回值：start
+      // lineModalVisible,
+      // confirmOrderId,
+      // confirmOrderLineCount,
+      // 注释排队相关返回值：end
       lineNumber,
       finishCheckPassenger,
       handleOk,
@@ -543,7 +559,9 @@ export default defineComponent({
       loadImageCode,
       showFirstImageCodeModal,
       validFirstImageCode,
-      onCancelOrder
+      // 注释取消排队方法返回值：start
+      // onCancelOrder
+      // 注释取消排队方法返回值：end
     };
   },
 });

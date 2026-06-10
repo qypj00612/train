@@ -21,6 +21,7 @@ import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.common.util.SnowUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,10 @@ public class SkTokenServiceImpl extends ServiceImpl<SkTokenMapper, SkToken>
     private final DailyTrainStationServiceImpl dailyTrainStationServiceImpl;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    @Value("spring.profiles.active")
+    private String env;
+
 
     @Override
     public void save(SkTokenSaveReq skTokenSaveReq) {
@@ -104,11 +109,15 @@ public class SkTokenServiceImpl extends ServiceImpl<SkTokenMapper, SkToken>
     }
 
     public boolean valid(Date date, String trainCode, Long memberId) {
-        String lockKey = RedisPreEnum.SK_LOCK.getDesc() + DateUtil.formatDate(date) + "_" + trainCode + "_" + memberId;
-        Boolean b = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
-        if(Boolean.FALSE.equals(b)){
-            return false;
+
+        if (env.equals("dev")) {
+            String lockKey = RedisPreEnum.SK_LOCK.getDesc() + DateUtil.formatDate(date) + "_" + trainCode + "_" + memberId;
+            Boolean b = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
+            if(Boolean.FALSE.equals(b)){
+                return false;
+            }
         }
+
         log.info("获取到令牌锁");
         String skCount = RedisPreEnum.SK_COUNT.getDesc() + DateUtil.formatDate(date) + "_" + trainCode;
         Object s = stringRedisTemplate.opsForValue().get(skCount);

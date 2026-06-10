@@ -38,8 +38,10 @@ public enum BusinessExceptionEnum {
 
     @Override
     public String toString() {
-        return "BusinessExceptionEnum{" +
-                "desc='" + desc + '\'' +
-                '}';
+        return desc;
+    }
+
+    public boolean equals(BusinessExceptionEnum businessExceptionEnum) {
+        return desc.equals(businessExceptionEnum.getDesc());
     }
 }

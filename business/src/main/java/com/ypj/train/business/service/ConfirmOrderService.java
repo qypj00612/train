@@ -1,8 +1,8 @@
 package com.ypj.train.business.service;
 
-import com.ypj.train.business.domain.ConfirmOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ypj.train.business.req.ConfirmOrderDoReq;
+import com.ypj.train.business.domain.ConfirmOrder;
+import com.ypj.train.business.domain.ConfirmOrderMQDTO;
 import com.ypj.train.business.req.ConfirmOrderQueryReq;
 import com.ypj.train.business.resp.ConfirmOrderQueryResp;
 import com.ypj.train.common.resp.PageResp;
@@ -16,5 +16,5 @@ public interface ConfirmOrderService extends IService<ConfirmOrder> {
 
     PageResp<ConfirmOrderQueryResp> query(ConfirmOrderQueryReq req);
 
-    void doConfirm(ConfirmOrderDoReq req);
+    void doConfirm(ConfirmOrderMQDTO req);
 }
