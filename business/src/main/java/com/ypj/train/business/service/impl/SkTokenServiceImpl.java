@@ -95,6 +95,11 @@ public class SkTokenServiceImpl extends ServiceImpl<SkTokenMapper, SkToken>
 
         skTokenMapper.insert(skToken);
     }
+
+    public boolean valid(Date date, String trainCode) {
+        int i = skTokenMapper.decrease(date,trainCode);
+        return i > 0;
+    }
 }
 
 

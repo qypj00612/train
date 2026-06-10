@@ -18,7 +18,9 @@ public enum BusinessExceptionEnum {
 
     TICKET_EXCEPTION("服务繁忙, 请稍后重试"),
     TICKET_EXCEPTION_LOCK("抢票人数过多, 请稍后重试"),
-    TICKET_EXCEPTION_FLOW("抢票人数太多了, 请稍后重试");
+    TICKET_EXCEPTION_FLOW("抢票人数太多了, 请稍后重试"),
+
+    CONFIRM_ORDER_SK_FALSE("票已卖光");
 
     private String desc;
 

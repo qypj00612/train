@@ -74,6 +74,8 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
 
     private final RedissonClient redissonClient;
 
+    private final SkTokenServiceImpl skTokenService;
+
     @Override
     public PageResp<ConfirmOrderQueryResp> query(ConfirmOrderQueryReq req) {
         Page<ConfirmOrder> confirmOrderPage = new Page<>(req.getPage(), req.getPageSize());
@@ -95,6 +97,10 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
         // 省略业务数据校验, 如: 车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0、同乘客同一天同车次是否已买过票
+        boolean validSkToken = skTokenService.valid(req.getDate(),req.getTrainCode());
+        if(Boolean.FALSE.equals(validSkToken)){
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_FALSE);
+        }
         String key = req.getDate()+"-"+req.getTrainCode();
         RLock lock = null;
         try {
