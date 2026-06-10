@@ -16,7 +16,10 @@ public class LoginMemberFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-        if(path.contains("/login")||path.contains("/send-code")||path.contains("/admin")){
+        if(path.contains("/login")
+                ||path.contains("/send-code")
+                ||path.contains("/admin")
+                ||path.contains("/kaptcha")){
             log.info("不需要登录校验：{}",path);
             return chain.filter(exchange);
         }

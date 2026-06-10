@@ -1,14 +1,17 @@
 package com.ypj.train.business.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ypj.train.business.domain.SkToken;
+import com.ypj.train.business.enums.RedisPreEnum;
 import com.ypj.train.business.mapper.SkTokenMapper;
 import com.ypj.train.business.req.SkTokenQueryReq;
 import com.ypj.train.business.req.SkTokenSaveReq;
@@ -18,10 +21,12 @@ import com.ypj.train.common.resp.PageResp;
 import com.ypj.train.common.util.SnowUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author Ypj
@@ -39,6 +44,8 @@ public class SkTokenServiceImpl extends ServiceImpl<SkTokenMapper, SkToken>
     private final DailyTrainSeatServiceImpl dailyTrainSeatServiceImpl;
 
     private final DailyTrainStationServiceImpl dailyTrainStationServiceImpl;
+
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public void save(SkTokenSaveReq skTokenSaveReq) {
@@ -96,9 +103,42 @@ public class SkTokenServiceImpl extends ServiceImpl<SkTokenMapper, SkToken>
         skTokenMapper.insert(skToken);
     }
 
-    public boolean valid(Date date, String trainCode) {
-        int i = skTokenMapper.decrease(date,trainCode);
-        return i > 0;
+    public boolean valid(Date date, String trainCode, Long memberId) {
+        String lockKey = RedisPreEnum.SK_LOCK.getDesc() + DateUtil.formatDate(date) + "_" + trainCode + "_" + memberId;
+        Boolean b = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
+        if(Boolean.FALSE.equals(b)){
+            return false;
+        }
+        log.info("获取到令牌锁");
+        String skCount = RedisPreEnum.SK_COUNT.getDesc() + DateUtil.formatDate(date) + "_" + trainCode;
+        Object s = stringRedisTemplate.opsForValue().get(skCount);
+        if(ObjectUtil.isNotNull(s)){
+            Long count = stringRedisTemplate.opsForValue().decrement(skCount,1);
+            if(count<1L){
+                log.info("令牌失效");
+                return false;
+            }
+            log.info("剩余令牌数: {}",count);
+            stringRedisTemplate.expire(skCount,60,TimeUnit.SECONDS);
+            if(count%5==0){
+                log.info("更新数据库");
+                skTokenMapper.decrease(date,trainCode,5);
+            }
+            return true;
+        }else{
+            LambdaQueryWrapper<SkToken> eq = new LambdaQueryWrapper<SkToken>()
+                    .eq(SkToken::getDate, DateUtil.formatDate(date))
+                    .eq(SkToken::getTrainCode, trainCode);
+            List<SkToken> skTokens = skTokenMapper.selectList(eq);
+            if(CollUtil.isEmpty(skTokens)){
+                return false;
+            }
+            SkToken skToken = skTokens.get(0);
+            Integer count = skToken.getCount()-1;
+            stringRedisTemplate.opsForValue().set(skCount, String.valueOf(count));
+            stringRedisTemplate.expire(skCount,60,TimeUnit.SECONDS);
+            return true;
+        }
     }
 }
 

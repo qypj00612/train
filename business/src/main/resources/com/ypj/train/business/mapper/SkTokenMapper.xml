@@ -18,7 +18,7 @@
     </sql>
 
     <update id="decrease">
-        update sk_token set count = if(count &lt; 1, 0,count-1)
+        update sk_token set count = if(count &lt; #{count}, 0,count-#{count})
         where DATE(date) = DATE(#{date})
         and train_code = #{trainCode}
         and count > 0

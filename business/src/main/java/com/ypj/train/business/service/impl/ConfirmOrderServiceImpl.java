@@ -20,6 +20,7 @@ import com.ypj.train.business.domain.DailyTrainCarriage;
 import com.ypj.train.business.domain.DailyTrainSeat;
 import com.ypj.train.business.domain.DailyTrainTicket;
 import com.ypj.train.business.enums.ConfirmOrderStatusEnum;
+import com.ypj.train.business.enums.RedisPreEnum;
 import com.ypj.train.business.enums.SeatColEnum;
 import com.ypj.train.business.enums.SeatTypeEnum;
 import com.ypj.train.business.mapper.ConfirmOrderMapper;
@@ -97,11 +98,11 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
         // 省略业务数据校验, 如: 车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0、同乘客同一天同车次是否已买过票
-        boolean validSkToken = skTokenService.valid(req.getDate(),req.getTrainCode());
+        boolean validSkToken = skTokenService.valid(req.getDate(),req.getTrainCode(),req.getMemberId());
         if(Boolean.FALSE.equals(validSkToken)){
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_FALSE);
         }
-        String key = req.getDate()+"-"+req.getTrainCode();
+        String key = RedisPreEnum.ORDER_LOCK.getDesc()+req.getDate()+"-"+req.getTrainCode();
         RLock lock = null;
         try {
             lock = redissonClient.getLock(key);

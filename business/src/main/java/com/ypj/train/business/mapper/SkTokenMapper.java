@@ -13,7 +13,7 @@ import java.util.Date;
 */
 public interface SkTokenMapper extends BaseMapper<SkToken> {
 
-    int decrease(Date date, String trainCode);
+    int decrease(Date date, String trainCode, Integer count);
 }
 
 
