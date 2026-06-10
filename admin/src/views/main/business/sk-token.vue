@@ -98,7 +98,7 @@ export default defineComponent({
     };
 
     const onDelete = (record) => {
-      axios.delete("/business/admin/sk-token/delete/" + record.id).then((response) => {
+      axios.delete("/admin/sk-token/delete/" + record.id).then((response) => {
         const data = response.data;
         if (data.success) {
           notification.success({description: "删除成功！"});
@@ -113,7 +113,7 @@ export default defineComponent({
     };
 
     const handleOk = () => {
-      axios.post("/business/admin/sk-token/save", skToken.value).then((response) => {
+      axios.post("/admin/sk-token/save", skToken.value).then((response) => {
         let data = response.data;
         if (data.success) {
           notification.success({description: "保存成功！"});
@@ -136,7 +136,7 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/business/admin/sk-token/query-list", {
+      axios.get("/admin/sk-token/query-list", {
         params: {
           page: param.page,
           pageSize: param.pageSize

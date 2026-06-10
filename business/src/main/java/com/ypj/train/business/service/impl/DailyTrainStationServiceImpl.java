@@ -159,6 +159,14 @@ public class DailyTrainStationServiceImpl extends ServiceImpl<DailyTrainStationM
         return dailyTrainStationMapper.selectList(dailyTrainStationLambdaQueryWrapper);
 
     }
+
+    public Integer countStation(Date date, String trainCode) {
+        LambdaQueryWrapper<DailyTrainStation> eq = new LambdaQueryWrapper<DailyTrainStation>()
+                .eq(DailyTrainStation::getDate, date)
+                .eq(DailyTrainStation::getTrainCode, trainCode);
+        Long l = dailyTrainStationMapper.selectCount(eq);
+        return Math.toIntExact(l);
+    }
 }
 
 
