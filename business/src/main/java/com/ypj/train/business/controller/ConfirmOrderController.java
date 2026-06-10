@@ -48,9 +48,15 @@ public class ConfirmOrderController {
             }
         }
 
-        beforeConfirmOrder.beforeDoConfirm(req);
+        Long id = beforeConfirmOrder.beforeDoConfirm(req);
         //confirmOrderService.doConfirm(req);
-        return new CommonResp<>();
+        return new CommonResp<>(String.valueOf(id));
+    }
+
+    @GetMapping("query-line-count/{id}")
+    public CommonResp<Integer> queryLineCount(@PathVariable Long id) {
+        Integer count = confirmOrderService.queryLineCount(id);
+        return new CommonResp<>(count);
     }
 
     public CommonResp<Object> doConfirmBlock(ConfirmOrderDoReq req, BlockException blockException) {

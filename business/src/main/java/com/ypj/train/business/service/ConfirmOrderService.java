@@ -17,4 +17,6 @@ public interface ConfirmOrderService extends IService<ConfirmOrder> {
     PageResp<ConfirmOrderQueryResp> query(ConfirmOrderQueryReq req);
 
     void doConfirm(ConfirmOrderMQDTO req);
+
+    Integer queryLineCount(Long id);
 }

@@ -38,7 +38,7 @@ public class BeforeConfirmOrderImpl implements BeforeConfirmOrder {
 
     @Override
     @SentinelResource(value = "beforeDoConfirm", blockHandler = "beforeDoConfirmBlock")
-    public void beforeDoConfirm(ConfirmOrderDoReq req) {
+    public Long beforeDoConfirm(ConfirmOrderDoReq req) {
         req.setMemberId(MemberContext.getId());
 
         boolean validSkToken = skTokenService.valid(req.getDate(),req.getTrainCode(),req.getMemberId());
@@ -75,6 +75,8 @@ public class BeforeConfirmOrderImpl implements BeforeConfirmOrder {
         log.info("向MQ发送信息: {}",jsonStr);
         rocketMQTemplate.convertAndSend(RocketMQTopicEnum.CONFIRM_ORDER.getCode(),jsonStr);
         log.info("信息发送完毕");
+
+        return confirmOrder.getId();
 
 //        String key = RedisPreEnum.ORDER_LOCK.getDesc()+req.getDate()+"-"+req.getTrainCode();
 //        RLock lock = null;

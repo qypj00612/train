@@ -149,7 +149,7 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
                 confirmOrderMapper.selectPage(confirmOrderPage,confirmOrderLambdaQueryWrapper);
                 List<ConfirmOrder> records = confirmOrderPage.getRecords();
                 if(CollUtil.isEmpty(records)){
-                    return;
+                    break;
                 }
                 for(ConfirmOrder confirmOrder : records){
                     try {
@@ -173,6 +173,38 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
             }
         }
 
+    }
+
+    @Override
+    public Integer queryLineCount(Long id) {
+        LambdaQueryWrapper<ConfirmOrder> eq = new LambdaQueryWrapper<ConfirmOrder>()
+                .eq(ConfirmOrder::getId, id);
+        ConfirmOrder confirmOrder = confirmOrderMapper.selectOne(eq);
+        ConfirmOrderStatusEnum by = EnumUtil.getBy(ConfirmOrderStatusEnum::getCode, confirmOrder.getStatus());
+        int result = switch (by){
+            case PENDING -> 0;
+            case SUCCESS -> -1;
+            case FAILURE -> -2;
+            case EMPTY -> -3;
+            case CANCEL -> -4;
+            default -> 999;
+        };
+
+        if(result!=999) return result;
+
+        LambdaQueryWrapper<ConfirmOrder> lt = new LambdaQueryWrapper<ConfirmOrder>()
+                .eq(ConfirmOrder::getDate, confirmOrder.getDate())
+                .eq(ConfirmOrder::getTrainCode, confirmOrder.getTrainCode())
+                .eq(ConfirmOrder::getStatus, ConfirmOrderStatusEnum.INIT.getCode())
+                .lt(ConfirmOrder::getCreateTime, confirmOrder.getCreateTime())
+                .or()
+                .eq(ConfirmOrder::getDate, confirmOrder.getDate())
+                .eq(ConfirmOrder::getTrainCode, confirmOrder.getTrainCode())
+                .eq(ConfirmOrder::getStatus, ConfirmOrderStatusEnum.PENDING.getCode())
+                .lt(ConfirmOrder::getCreateTime, confirmOrder.getCreateTime());
+
+        result = Math.toIntExact(confirmOrderMapper.selectCount(lt));
+        return result;
     }
 
     private void sell(ConfirmOrder confirmOrder) {
@@ -280,6 +312,7 @@ public class ConfirmOrderServiceImpl extends ServiceImpl<ConfirmOrderMapper, Con
             proxy.afterConfirm(dailyTrainTicket, finDailyTrainSeats, req.getTickets(), confirmOrder);
         } catch (Exception e) {
             log.info("购票异常");
+            updateConfirmOrder(confirmOrder,ConfirmOrderStatusEnum.FAILURE.getCode());
             throw new BusinessException(BusinessExceptionEnum.TICKET_EXCEPTION_LOCK);
         }
     }
